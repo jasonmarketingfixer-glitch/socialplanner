@@ -30,8 +30,9 @@ button,input,select,textarea{font-family:inherit}
   padding:16px 18px 13px;position:sticky;top:0;z-index:100;
 }
 .hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.hdr-logo{display:flex;align-items:center;gap:8px}
-.hdr-wordmark{color:#fff;font-weight:800;font-size:15px;letter-spacing:-.3px;line-height:1.2}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-logo-img{height:36px;width:auto;object-fit:contain;flex-shrink:0}
+.hdr-wordmark{color:#fff;font-weight:800;font-size:13px;letter-spacing:-.2px;line-height:1.2}
 .hdr-sub{color:rgba(255,255,255,.5);font-size:10px;font-weight:500}
 
 .hdr-bot{display:flex;align-items:center;justify-content:space-between}
@@ -204,25 +205,51 @@ button,input,select,textarea{font-family:inherit}
 .btn-write.no{background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff}
 .btn-write:hover{opacity:.88}
 
+/* ── PLAN DOCUMENT ───────────────────────────────── */
+.doc-wrap{font-family:'DM Sans',system-ui,sans-serif;color:var(--dark)}
+.doc-cover{background:linear-gradient(135deg,#1B0A6E 0%,#0D3B6E 55%,#007DA8 100%);border-radius:14px;padding:20px 18px 18px;margin-bottom:20px;color:#fff}
+.doc-cover-eyebrow{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.5;margin-bottom:6px}
+.doc-cover-title{font-size:18px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.doc-cover-sub{font-size:12px;opacity:.65;margin-bottom:12px}
+.doc-cover-chips{display:flex;gap:6px;flex-wrap:wrap}
+.doc-cover-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600}
+.doc-section{margin-bottom:22px}
+.doc-h1{font-size:15px;font-weight:800;color:var(--indigo);letter-spacing:-.2px;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid rgba(27,10,110,.1)}
+.doc-h2{font-size:12px;font-weight:800;color:var(--grey);letter-spacing:.07em;text-transform:uppercase;margin:14px 0 7px}
+.doc-p{font-size:13px;color:#374151;line-height:1.65;margin-bottom:8px}
+.doc-callout{background:#F0F7FA;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 13px;font-size:12px;color:var(--indigo);font-weight:600;line-height:1.5;margin-bottom:10px}
+.doc-week-band{display:flex;align-items:stretch;border-radius:11px;overflow:hidden;margin-bottom:16px;border:1.5px solid var(--border)}
+.doc-week-accent{width:5px;flex-shrink:0}
+.doc-week-body{flex:1;padding:13px 14px}
+.doc-week-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin-bottom:2px}
+.doc-week-theme{font-size:14px;font-weight:800;color:var(--dark);margin-bottom:3px}
+.doc-week-goal{font-size:11px;color:#6B7280;line-height:1.4}
+.doc-plat-row{margin-bottom:10px}
+.doc-plat-lbl{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.doc-plat-name{font-size:11px;font-weight:800}
+.doc-post-list{list-style:none;padding:0;margin:0}
+.doc-post-list li{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px solid #F9FAFB;font-size:12px;color:#374151;line-height:1.5}
+.doc-post-list li:last-child{border-bottom:none}
+.doc-post-num{font-size:10px;font-weight:800;color:var(--muted);flex-shrink:0;width:14px;text-align:right}
+.doc-post-type{font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;flex-shrink:0;margin-top:1px}
+.doc-post-text{flex:1}
+.doc-post-cta{font-size:11px;font-style:italic;margin-top:1px}
+.doc-action-list{list-style:none;padding:0;margin:0}
+.doc-action-list li{display:flex;gap:8px;padding:5px 0;font-size:12px;color:#374151;line-height:1.5;border-bottom:1px solid #F9FAFB}
+.doc-action-list li:last-child{border-bottom:none}
+.doc-action-list li::before{content:"□";font-size:13px;color:var(--indigo);flex-shrink:0;margin-top:1px}
+.doc-kpi-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:12px}
+.doc-kpi-row:last-child{border-bottom:none}
+.doc-divider{height:1px;background:var(--border);margin:18px 0}
+.doc-tagline{text-align:center;font-size:11px;font-style:italic;color:var(--muted);padding:8px 0 4px}
+
 /* ── WEEK PLAN ───────────────────────────────────── */
-.wk-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.wk-tabs::-webkit-scrollbar{display:none}
-.wk-tab{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:700;border:1.5px solid var(--border);background:#fff;color:#6B7280;cursor:pointer;transition:all .15s}
-.wk-tab.active{background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;border-color:transparent}
-.wk-hero{background:linear-gradient(135deg,#1B0A6E 0%,#0D4B8E 60%,#00B4D8 100%);border-radius:14px;padding:17px;margin-bottom:16px;color:#fff}
+
 .wk-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.55;margin-bottom:3px;text-transform:uppercase}
 .wk-theme{font-size:16px;font-weight:800;margin-bottom:5px}
 .wk-desc{font-size:12px;opacity:.75;margin-bottom:5px;line-height:1.4}
 .wk-goal{font-size:11px;opacity:.6;line-height:1.4}
-.plat-sec{margin-bottom:16px}
-.plat-sec-hdr{display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.plat-sec-name{font-size:12px;font-weight:800}
-.plat-ct{border-radius:20px;padding:1px 7px;font-size:10px;font-weight:700}
-.plan-card{background:#fff;border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1.5px solid}
-.plan-row{display:flex;gap:7px;align-items:flex-start}
-.plan-type{border-radius:6px;padding:2px 6px;font-size:9px;font-weight:800;flex-shrink:0;margin-top:2px}
-.plan-title{font-size:12px;font-weight:600;color:var(--dark);line-height:1.4}
-.plan-cta{font-size:11px;font-weight:500;margin-top:3px}
+
 
 /* ── MODAL ───────────────────────────────────────── */
 .overlay{position:fixed;inset:0;background:rgba(10,5,40,.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:1000;animation:fadeIn .18s ease}
@@ -300,8 +327,9 @@ input:checked+.toggle-slider:before{transform:translateX(16px)}
   <div id="hdr">
     <div class="hdr-top">
       <div class="hdr-logo">
+        <img class="hdr-logo-img" src="https://elevatesyracuse.com/app/uploads/2025/10/Pink-White-Playful-Celebratory-Drive-by-Graduation-Banner.png" alt="Elevate Fitness" onerror="this.style.display='none'"/>
         <div>
-          <div class="hdr-wordmark">⚡ Elevate Content Hub</div>
+          <div class="hdr-wordmark">Content Hub</div>
           <div class="hdr-sub" id="hdr-sub">DeWitt &amp; Liverpool · <span id="hdr-month"></span></div>
         </div>
       </div>
@@ -351,11 +379,12 @@ let S = {
 
   filterPlat: "All",
   filterStat: "All",
-  planWeek: 1,
+
   expPosts: new Set(),
   expNeeded: new Set(),
   modalId: null,
   syncing: false,
+  syncDone: false,
   lastSync: null,
   posts: [
     {id:"p01",title:"5 Things You Didn't Know About Elevate",platform:"Instagram",type:"Carousel",status:"Done",
@@ -436,10 +465,32 @@ const canApprove = () => true;
 // Only rows with Need Content = true appear in the Needed tab.
 // This is separate from S.posts (which is the current-week calendar).
 let nextWeekItems = [];   // { notionUrl, title, platform, notes, type, claimedBy, contentLink, needContent }
+let syncErrors = [];      // surfaces API/parse errors to the UI
+
+// Helper: extract a JSON array from any Claude API response text,
+// even if it's wrapped in markdown fences or has leading prose.
+function extractJsonArray(text){
+  // Try bare array first
+  let m = text.match(/\[[\s\S]*\]/);
+  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+  // Try stripping ```json fences
+  const fenced = text.replace(/```(?:json)?/gi,'');
+  m = fenced.match(/\[[\s\S]*\]/);
+  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
+  return null;
+}
+
+// Helper: normalise NeedContent to boolean — handles true, "true", "__YES__", 1
+function parseNeedContent(v){
+  if(v === true || v === 1) return true;
+  if(typeof v === 'string') return v.trim().toUpperCase() === '__YES__' || v.trim().toLowerCase() === 'true';
+  return false;
+}
 
 async function syncNotion(){
   if(S.syncing) return;
   S.syncing = true;
+  syncErrors = [];
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spin-sm"></div> Syncing…';
@@ -451,8 +502,8 @@ async function syncNotion(){
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         model:"claude-sonnet-4-20250514", max_tokens:2000,
-        system:"Notion sync helper. Return ALL rows as a plain JSON array only — no prose, no fences.",
-        messages:[{role:"user",content:`Query Notion data source collection://3203728f-a926-815f-a710-000bbdd7f827 (next week planning). Return ALL rows as a JSON array. Each object: notionUrl (page url), title (from "Notes" title column), Platform, Status, Notes, ClaimedBy (from "Claimed By"), ContentLink (from "Content Link"), NeedContent (from "Need Content": true if __YES__, false otherwise). Return ONLY the JSON array.`}],
+        system:"You are a Notion data helper. Query the requested data source and return ALL rows as a JSON array. No prose, no markdown fences — raw JSON array only.",
+        messages:[{role:"user",content:`Query Notion data source collection://3203728f-a926-815f-a710-000bbdd7f827 (Elevate Fitness next week planning). Return every row as a JSON array of objects with these fields: notionUrl (the page url field), title (the "Notes" title column value), Platform (the Platform select value), Status, Notes (same as title), ClaimedBy (the "Claimed By" text field), ContentLink (the "Content Link" url field), NeedContent (boolean — true only if "Need Content" checkbox is checked / equals __YES__). Return ONLY a valid JSON array, nothing else.`}],
         mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
       })
     }),
@@ -461,8 +512,8 @@ async function syncNotion(){
       method:"POST", headers:{"Content-Type":"application/json"},
       body: JSON.stringify({
         model:"claude-sonnet-4-20250514", max_tokens:3000,
-        system:"Notion sync helper. Return ALL rows as a plain JSON array only — no prose, no fences.",
-        messages:[{role:"user",content:`Query Notion data source collection://24c3728f-a926-8185-b963-000b55ab896e (Elevate Fitness current week). Return ALL rows as a JSON array. Each object: notionUrl (page url), title (from the title column "Week of March 9, 2025"), Platform, Status, Caption, Notes, Date (from "Date" field — ISO date string or null), NeedContent (from "Need Content": true if __YES__, false otherwise), ClaimedBy (from "Claimed By"), ContentLink (from "Content Link"), HasPost (true if "Post" field is non-empty array, false otherwise). Return ONLY the JSON array.`}],
+        system:"You are a Notion data helper. Query the requested data source and return ALL rows as a JSON array. No prose, no markdown fences — raw JSON array only.",
+        messages:[{role:"user",content:`Query Notion data source collection://24c3728f-a926-8185-b963-000b55ab896e (Elevate Fitness current week). Return every row as a JSON array of objects with these fields: notionUrl (the page url), title (the title column value), Platform, Status, Caption, Notes, Date (ISO date string from the Date field, or null), NeedContent (boolean — true only if "Need Content" checkbox is checked / equals __YES__), ClaimedBy (from "Claimed By"), ContentLink (from "Content Link"), HasPost (true if Post field has any files, false otherwise). Return ONLY a valid JSON array, nothing else.`}],
         mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
       })
     })
@@ -472,57 +523,78 @@ async function syncNotion(){
   if(nextRes.status === 'fulfilled'){
     try {
       const data = await nextRes.value.json();
-      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-      const match = text.match(/\[[\s\S]*\]/);
-      if(match){
-        const rows = JSON.parse(match[0]);
-        nextWeekItems = rows.map((r,i) => ({
-          id:'nw-'+i,
-          notionUrl: r.notionUrl||'',
-          title: r.title||r.Notes||'(Untitled)',
-          platform: r.Platform||'',
-          notes: r.Notes||r.title||'',
-          claimedBy: r.ClaimedBy||'',
-          contentLink: r.ContentLink||'',
-          needContent: r.NeedContent===true||r.NeedContent==='__YES__',
-        }));
+      // Surface API-level errors
+      if(data.error){ syncErrors.push('Next week DB: ' + (data.error.message||JSON.stringify(data.error))); }
+      else {
+        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+        const rows = extractJsonArray(text);
+        if(rows && Array.isArray(rows)){
+          nextWeekItems = rows.map((r,i) => ({
+            id:'nw-'+i,
+            notionUrl: r.notionUrl||r.url||'',
+            title: r.title||r.Notes||'(Untitled)',
+            platform: r.Platform||'',
+            notes: r.Notes||r.title||'',
+            claimedBy: r.ClaimedBy||'',
+            contentLink: r.ContentLink||'',
+            needContent: parseNeedContent(r.NeedContent),
+          }));
+        } else {
+          syncErrors.push('Next week DB: could not parse response — ' + text.slice(0,120));
+        }
       }
-    } catch(e){}
+    } catch(e){ syncErrors.push('Next week DB fetch error: ' + e.message); }
+  } else {
+    syncErrors.push('Next week DB network error: ' + nextRes.reason);
   }
 
   // Parse current-week results — replaces S.posts
   if(curRes.status === 'fulfilled'){
     try {
       const data = await curRes.value.json();
-      const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-      const match = text.match(/\[[\s\S]*\]/);
-      if(match){
-        const rows = JSON.parse(match[0]);
-        S.posts = rows.map((r,i) => ({
-          id: 'cw-'+i,
-          notionUrl: r.notionUrl||'',
-          title: r.title||'(Untitled)',
-          platform: r.Platform||'',
-          type: r.Platform||'',   // type not separately stored; use platform as fallback
-          status: r.Status||'Not started',
-          caption: r.Caption||'',
-          notes: r.Notes||'',
-          date: r.Date||null,        // ISO date string e.g. "2026-03-09"
-          needContent: r.NeedContent===true||r.NeedContent==='__YES__',
-          claimedBy: r.ClaimedBy||'',
-          contentLink: r.ContentLink||'',
-          hasPost: r.HasPost===true,
-        }));
+      if(data.error){ syncErrors.push('Current week DB: ' + (data.error.message||JSON.stringify(data.error))); }
+      else {
+        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+        const rows = extractJsonArray(text);
+        if(rows && Array.isArray(rows)){
+          S.posts = rows.map((r,i) => ({
+            id: 'cw-'+i,
+            notionUrl: r.notionUrl||r.url||'',
+            title: r.title||'(Untitled)',
+            platform: r.Platform||'',
+            type: r.Platform||'',
+            status: r.Status||'Not started',
+            caption: r.Caption||'',
+            notes: r.Notes||'',
+            date: r.Date||null,
+            needContent: parseNeedContent(r.NeedContent),
+            claimedBy: r.ClaimedBy||'',
+            contentLink: r.ContentLink||'',
+            hasPost: r.HasPost===true,
+          }));
+        } else {
+          syncErrors.push('Current week DB: could not parse response — ' + text.slice(0,120));
+        }
       }
-    } catch(e){}
+    } catch(e){ syncErrors.push('Current week DB fetch error: ' + e.message); }
+  } else {
+    syncErrors.push('Current week DB network error: ' + curRes.reason);
   }
 
+  S.syncDone = true;   // distinguish "never synced" from "synced but empty"
   S.lastSync = new Date();
   S.syncing = false;
   btn.disabled = false;
-  btn.innerHTML = '✓ Synced';
-  document.getElementById('sync-info').textContent = `Synced ${S.lastSync.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
-  setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 3000);
+
+  if(syncErrors.length){
+    btn.innerHTML = '⚠️ Sync error';
+    document.getElementById('sync-info').textContent = syncErrors[0];
+    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 5000);
+  } else {
+    btn.innerHTML = '✓ Synced';
+    document.getElementById('sync-info').textContent = `Synced ${S.lastSync.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 3000);
+  }
   render();
 }
 
@@ -558,27 +630,33 @@ async function writeCalNotion(item, updates){
    CONTENT NEEDED TAB
 ══════════════════════════════════════════════════ */
 function renderNeeded(){
-  // Only show rows from the next-week planning DB where Need Content is explicitly checked
-  const all = nextWeekItems.filter(p => p.needContent === true);
+  // Show sync errors prominently if any
+  const errBanner = syncErrors.length
+    ? `<div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#991B1B;line-height:1.5">
+        <strong>⚠️ Sync error</strong><br>${syncErrors.map(e=>`<div style="margin-top:4px;font-family:monospace;font-size:11px;word-break:break-all">${esc(e)}</div>`).join('')}
+       </div>`
+    : '';
 
-  // If Notion hasn't been synced yet, prompt the user
-  if(nextWeekItems.length === 0){
-    return `<div class="empty">
+  // Not yet synced
+  if(!S.syncDone){
+    return `${errBanner}<div class="empty">
       <div class="empty-icon">🔄</div>
       <div class="empty-title">Sync to load content requests</div>
       <div class="empty-desc">Tap <strong>↑ Sync Notion</strong> above to pull from your <em>Elevate Fitness (next week planning)</em> database. Only rows with the <strong>"Need Content"</strong> checkbox checked will appear here.</div>
     </div>`;
   }
 
+  const all = nextWeekItems.filter(p => p.needContent === true);
+
   if(!all.length){
-    return `<div class="empty">
+    return `${errBanner}<div class="empty">
       <div class="empty-icon">✅</div>
       <div class="empty-title">No content requests right now</div>
       <div class="empty-desc">In Notion, check the <strong>"Need Content"</strong> box on any row in <em>Elevate Fitness (next week planning)</em> to surface it here for the team to claim.</div>
     </div>`;
   }
 
-  let html = '';
+  let html = errBanner;
   all.forEach(p => { html += needCard(p); });
   return html;
 }
@@ -804,14 +882,13 @@ function calCard(p){
     else if(p.notes) body += `<div><div class="body-lbl">Notes</div><div class="notes-txt">${esc(p.notes)}</div></div>`;
     if(p.cta) body += `<div style="font-size:12px;color:var(--indigo);font-weight:600;background:#F0F7FA;border-radius:8px;padding:7px 10px">🎯 ${esc(p.cta)}</div>`;
 
-    // Notion link — opens the row (where the Post attachment lives)
+    // Notion link — always shown, label changes based on whether creative is attached
     if(p.notionUrl){
       const label = p.hasPost ? '🎬 View Creative in Notion ↗' : '📄 Open in Notion ↗';
       body += `<a class="btn-notion" href="${esc(p.notionUrl)}" target="_blank" rel="noopener">${label}</a>`;
     }
 
     if(p.needContent) body += `<div class="info-pill yellow">🎬 Creative needed — check the <strong>Needed</strong> tab</div>`;
-    body += `<button class="btn-write ${p.caption?'has':'no'}" onclick="openModal('${p.id}')">${p.caption?'✏️ Edit Caption':'✨ Write Caption'}</button>`;
     body += `</div>`;
   }
   return `<div class="cal-card${exp?' exp':''}" id="card-${p.id}">
@@ -997,80 +1074,135 @@ const PLAN_DATA = {
 
 function renderPlan(){
   const plan = PLAN_DATA;
-  const wk   = plan.weeks[S.planWeek - 1];
-  const pc   = {
-    1:{t:"#fff",bg:wk.color},
-    2:{t:"#fff",bg:wk.color},
-    3:{t:"#fff",bg:wk.color},
-    4:{t:"#fff",bg:wk.color},
-  }[S.planWeek];
 
-  // Week selector tabs
-  let html = `<div class="wk-tabs">${plan.weeks.map(w=>`<button class="wk-tab${S.planWeek===w.w?' active':''}" onclick="setPW(${w.w})">Week ${w.w}</button>`).join('')}</div>`;
+  const PLAT_STYLES = {
+    instagram: {icon:"📸", color:"#E1306C", bg:"rgba(225,48,108,.08)"},
+    facebook:  {icon:"👥", color:"#1877F2", bg:"rgba(24,119,242,.08)"},
+    tiktok:    {icon:"🎵", color:"#111",    bg:"rgba(0,0,0,.06)"},
+  };
 
-  // Week hero
-  html += `<div class="wk-hero" style="background:linear-gradient(135deg,${wk.color} 0%,#00B4D8 100%)">
-    <div class="wk-eyebrow">Week ${wk.w} of 4 · March 2026</div>
-    <div class="wk-theme">"${esc(wk.theme)}"</div>
-    <div class="wk-goal">🎯 ${esc(wk.goal)}</div>
+  function platSection(key, posts){
+    const s = PLAT_STYLES[key];
+    const items = posts.map((p,i)=>`<li>
+      <span class="doc-post-num">${i+1}.</span>
+      <span class="doc-post-type" style="background:${s.bg};color:${s.color}">${esc(p.type)}</span>
+      <span class="doc-post-text">
+        ${esc(p.title)}
+        ${p.cta?`<div class="doc-post-cta" style="color:${s.color}">→ ${esc(p.cta)}</div>`:''}
+      </span>
+    </li>`).join('');
+    return `<div class="doc-plat-row">
+      <div class="doc-plat-lbl">
+        <span>${s.icon}</span>
+        <span class="doc-plat-name" style="color:${s.color}">${key.charAt(0).toUpperCase()+key.slice(1)}</span>
+        <span style="font-size:10px;color:var(--muted);font-weight:600">&nbsp;· ${posts.length} posts</span>
+      </div>
+      <ul class="doc-post-list">${items}</ul>
+    </div>`;
+  }
+
+  let html = `<div class="doc-wrap">`;
+
+  // ── Cover ──
+  html += `<div class="doc-cover">
+    <div class="doc-cover-eyebrow">Elevate Fitness · DeWitt &amp; Liverpool</div>
+    <div class="doc-cover-title">30-Day Social Media Action Plan</div>
+    <div class="doc-cover-sub">Building Engagement, Community &amp; Lead Generation · March 2026</div>
+    <div class="doc-cover-chips">
+      <span class="doc-cover-chip">📸 Instagram</span>
+      <span class="doc-cover-chip">👥 Facebook</span>
+      <span class="doc-cover-chip">🎵 TikTok</span>
+    </div>
   </div>`;
 
-  // Posts per platform
-  const sections = [
-    {key:"instagram", label:"Instagram", icon:"📸", color:"#E1306C", bg:"rgba(225,48,108,.07)", posts:wk.instagram},
-    {key:"facebook",  label:"Facebook",  icon:"👥", color:"#1877F2", bg:"rgba(24,119,242,.07)",  posts:wk.facebook},
-    {key:"tiktok",    label:"TikTok",    icon:"🎵", color:"#111",    bg:"rgba(0,0,0,.05)",       posts:wk.tiktok},
-  ];
+  // ── Strategic Framework ──
+  html += `<div class="doc-section">
+    <div class="doc-h1">Strategic Framework</div>
+    <div class="doc-callout">Goal: Move every prospect one step closer to walking through our doors. Social media starts the conversation — the sales team closes it.</div>
 
-  sections.forEach(sec => {
-    html += `<div class="plat-sec">
-      <div class="plat-sec-hdr">
-        <span>${sec.icon}</span>
-        <span class="plat-sec-name" style="color:${sec.color}">${sec.label}</span>
-        <span class="plat-ct" style="background:${sec.bg};color:${sec.color}">${sec.posts.length} posts</span>
-      </div>
-      ${sec.posts.map((p,i)=>`<div class="plan-card" style="border-color:${sec.color}25">
-        <div class="plan-row">
-          <span class="plan-type" style="background:${sec.bg};color:${sec.color};min-width:26px;text-align:center">${i+1}</span>
-          <div style="flex:1">
-            <div style="display:flex;align-items:flex-start;gap:5px">
-              <span style="font-size:9px;background:${sec.bg};color:${sec.color};border-radius:5px;padding:1px 6px;font-weight:800;flex-shrink:0;margin-top:2px">${esc(p.type)}</span>
-              <div class="plan-title">${esc(p.title)}</div>
-            </div>
-            ${p.cta?`<div class="plan-cta" style="color:${sec.color}">→ ${esc(p.cta)}</div>`:''}
-          </div>
-        </div>
-      </div>`).join('')}
+    <div class="doc-h2">Content Mix — The 60 / 30 / 10 Rule</div>`;
+  plan.strategy.mix.forEach(m => {
+    html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:7px">
+      <span style="font-size:13px;font-weight:800;color:var(--indigo);flex-shrink:0;width:34px">${esc(m.pct)}</span>
+      <div><span style="font-size:12px;font-weight:700;color:var(--dark)">${esc(m.cat)}</span>
+      <div style="font-size:11px;color:var(--muted);margin-top:1px;line-height:1.4">${esc(m.eg)}</div></div>
     </div>`;
   });
 
-  // Week action items
-  if(wk.actions && wk.actions.length){
-    html += `<div style="background:#F8F6FF;border:1.5px solid rgba(27,10,110,.12);border-radius:13px;padding:14px 15px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;color:var(--indigo);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">✅ Week ${wk.w} Action Items</div>
-      ${wk.actions.map(a=>`<div style="display:flex;gap:8px;margin-bottom:7px;font-size:12px;color:#374151;line-height:1.5"><span style="color:var(--blue);font-weight:800;flex-shrink:0">→</span>${esc(a)}</div>`).join('')}
+  html += `<div class="doc-h2">Soft CTAs We Use</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden">`;
+  plan.strategy.ctaExamples.forEach((c,i) => {
+    html += `<div style="display:flex;gap:0;${i<plan.strategy.ctaExamples.length-1?'border-bottom:1px solid #F3F4F6':''}">
+      <div style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;color:var(--indigo)">"${esc(c.soft)}"</div>
+      <div style="flex:1;padding:8px 12px;font-size:11px;color:var(--muted);border-left:1px solid #F3F4F6">${esc(c.does)}</div>
     </div>`;
-  }
+  });
+  html += `</div></div>`;
 
-  // On week 4, also show KPIs
-  if(S.planWeek === 4){
-    html += `<div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:14px 15px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;color:var(--grey);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">📊 30-Day Growth Targets</div>
-      ${PLAN_DATA.kpis.growth.map(g=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #F3F4F6;font-size:12px">
-        <span style="font-weight:700;color:var(--dark)">${esc(g.platform)}</span>
-        <span style="color:var(--muted)">Start: <strong>${esc(g.start)}</strong></span>
-        <span style="color:var(--green);font-weight:700">${esc(g.organic)}</span>
-      </div>`).join('')}
-      <div style="font-size:10px;color:var(--muted);margin-top:8px">Organic targets shown. Paid targets higher with budget.</div>
-    </div>
-    <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:14px 15px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:800;color:var(--grey);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px">🎯 Metrics That Matter</div>
-      ${PLAN_DATA.kpis.metrics.map(m=>`<div style="padding:7px 0;border-bottom:1px solid #F3F4F6">
-        <div style="font-size:12px;font-weight:700;color:var(--dark)">${esc(m.metric)}</div>
-        <div style="font-size:11px;color:var(--indigo);font-weight:600;margin-top:2px">${esc(m.target)}</div>
-      </div>`).join('')}
+  html += `<div class="doc-divider"></div>`;
+
+  // ── Week-by-week ──
+  html += `<div class="doc-section"><div class="doc-h1">The 4-Week Playbook</div>`;
+
+  plan.weeks.forEach(wk => {
+    html += `<div class="doc-week-band">
+      <div class="doc-week-accent" style="background:${wk.color}"></div>
+      <div class="doc-week-body">
+        <div class="doc-week-label">Week ${wk.w}</div>
+        <div class="doc-week-theme">"${esc(wk.theme)}"</div>
+        <div class="doc-week-goal">${esc(wk.goal)}</div>
+      </div>
     </div>`;
-  }
+
+    // Platform post lists
+    html += platSection('instagram', wk.instagram);
+    html += platSection('facebook',  wk.facebook);
+    html += platSection('tiktok',    wk.tiktok);
+
+    // Action items
+    if(wk.actions && wk.actions.length){
+      html += `<div style="background:#F8F6FF;border-radius:10px;padding:11px 13px;margin-top:10px">
+        <div style="font-size:10px;font-weight:800;color:var(--indigo);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">✅ Week ${wk.w} Action Items</div>
+        <ul class="doc-action-list">${wk.actions.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+      </div>`;
+    }
+
+    if(wk.w < 4) html += `<div class="doc-divider"></div>`;
+  });
+
+  html += `</div>`;
+
+  html += `<div class="doc-divider"></div>`;
+
+  // ── KPIs ──
+  html += `<div class="doc-section">
+    <div class="doc-h1">30-Day Targets &amp; KPIs</div>
+    <div class="doc-h2">Follower Growth</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;background:#F9FAFB;padding:6px 12px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)">
+        <span>Platform</span><span>Start</span><span>Organic</span><span style="color:var(--green)">w/ Paid</span>
+      </div>
+      ${plan.kpis.growth.map(g=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;font-size:12px;border-bottom:1px solid #F9FAFB">
+        <span style="font-weight:700">${esc(g.platform)}</span>
+        <span style="color:var(--muted)">${esc(g.start)}</span>
+        <span style="font-weight:600">${esc(g.organic)}</span>
+        <span style="color:var(--green);font-weight:700">${esc(g.paid)}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="doc-h2">Metrics That Matter</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:4px 12px;margin-bottom:14px">
+      ${plan.kpis.metrics.map(m=>`<div class="doc-kpi-row">
+        <span style="font-weight:700;color:var(--dark)">${esc(m.metric)}</span>
+        <span style="font-weight:700;color:var(--indigo)">${esc(m.target)}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="doc-callout">Vanity check: Follower count and likes are nice — but if they're not converting to tours and memberships, they're not doing their job. Always ask: "How many leads did this produce?"</div>
+  </div>
+
+  <div class="doc-tagline">Real people. Real fitness. Real community. · elevatesyracuse.com</div>
+  </div>`; // close doc-wrap
 
   return html;
 }
@@ -1215,7 +1347,7 @@ function cycleStatus(e){
 }
 
 function setFP(v){ S.filterPlat = v; render(); }
-function setPW(v){ S.planWeek  = v; render(); }
+
 
 function claimPost(id){
   const el = document.getElementById('name-'+id);
