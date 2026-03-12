@@ -1,0 +1,1370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>⚡ Elevate Content Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --indigo:#1B0A6E;--blue:#00B4D8;--grey:#63666A;--bg:#F0F7FA;--dark:#1A1A2E;
+  --white:#fff;--border:#E5E7EB;--green:#059669;--amber:#D97706;--red:#DC2626;
+  --muted:#9CA3AF;--surface:#fff;
+}
+html,body{height:100%;font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--dark);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* ── LAYOUT ─────────────────────────────────────── */
+#app{max-width:430px;margin:0 auto;min-height:100svh;display:flex;flex-direction:column;position:relative}
+
+/* ── HEADER ─────────────────────────────────────── */
+#hdr{
+  background:linear-gradient(135deg,#1B0A6E 0%,#0D3B6E 55%,#007DA8 100%);
+  padding:16px 18px 13px;position:sticky;top:0;z-index:100;
+}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-logo-img{height:36px;width:auto;object-fit:contain;flex-shrink:0}
+.hdr-wordmark{color:#fff;font-weight:800;font-size:13px;letter-spacing:-.2px;line-height:1.2}
+.hdr-sub{color:rgba(255,255,255,.5);font-size:10px;font-weight:500}
+
+.hdr-bot{display:flex;align-items:center;justify-content:space-between}
+#sync-info{font-size:10px;color:rgba(255,255,255,.4)}
+#sync-btn{
+  background:rgba(255,255,255,.15);color:#fff;
+  border:1px solid rgba(255,255,255,.25);border-radius:8px;
+  padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:5px;transition:opacity .15s;
+}
+#sync-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── TABS ────────────────────────────────────────── */
+#tabs{
+  display:flex;background:#fff;
+  border-bottom:2px solid var(--border);
+  position:sticky;top:77px;z-index:99;
+}
+.tab{
+  flex:1;padding:11px 6px;border:none;background:none;
+  font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;
+  border-bottom:2px solid transparent;margin-bottom:-2px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  transition:color .15s,border-color .15s;position:relative;white-space:nowrap;
+}
+.tab.active{color:var(--indigo);font-weight:800;border-bottom-color:var(--indigo)}
+.tab-badge{
+  background:var(--red);color:#fff;border-radius:20px;
+  padding:1px 5px;font-size:9px;font-weight:800;
+}
+
+/* ── MAIN CONTENT ────────────────────────────────── */
+#main{padding:14px 13px 88px;flex:1;animation:fadeUp .2s ease}
+
+/* ── FOOTER ──────────────────────────────────────── */
+#foot{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:rgba(255,255,255,.94);backdrop-filter:blur(10px);
+  border-top:1px solid var(--border);
+  padding:8px 18px max(10px, env(safe-area-inset-bottom));
+  display:flex;justify-content:space-between;align-items:center;z-index:97;
+}
+.foot-l{font-size:10px;color:var(--muted)}
+.foot-r{font-size:10px;font-weight:700;color:var(--indigo)}
+
+/* ── SECTION HDR ─────────────────────────────────── */
+.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:11px}
+.sec-title{font-size:11px;font-weight:800;color:var(--grey);letter-spacing:.06em;text-transform:uppercase}
+.sec-ct{background:var(--indigo);color:#fff;border-radius:20px;padding:1px 8px;font-size:10px;font-weight:800}
+
+/* ── PROGRESS CARD ───────────────────────────────── */
+.prog-card{background:#fff;border-radius:13px;padding:14px 15px;margin-bottom:13px;border:1.5px solid var(--border)}
+.prog-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.prog-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+.prog-val{font-size:12px;font-weight:800;color:var(--green)}
+.prog-bar-bg{height:7px;background:#F3F4F6;border-radius:4px;overflow:hidden;margin-bottom:10px}
+.prog-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--indigo),var(--blue));transition:width .5s ease}
+.prog-dots{display:flex;gap:12px;flex-wrap:wrap}
+.prog-dot{display:flex;align-items:center;gap:4px;font-size:10px;color:#6B7280}
+.dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+
+/* ── FILTER CHIPS ────────────────────────────────── */
+.chips{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:5px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:#6B7280;cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip.ap{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.chip.as{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* ── CN CARD (Content Needed) ────────────────────── */
+.cn-card{
+  background:#fff;border-radius:14px;border:1.5px solid var(--border);
+  margin-bottom:10px;overflow:hidden;
+}
+.cn-card.is-claimed{border-color:#A7F3D0;background:#F0FDF4}
+.cn-card.is-submitted{border-color:#93C5FD;background:#EFF6FF}
+
+.cn-top{padding:13px 14px;cursor:pointer}
+.cn-r1{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px}
+.cn-title{font-size:13px;font-weight:700;color:var(--dark);flex:1;line-height:1.35}
+.st-pill{flex-shrink:0;padding:3px 8px;border-radius:20px;font-size:9px;font-weight:800;white-space:nowrap;border:1.5px solid}
+.st-open{background:#FEF9C3;color:#92400E;border-color:#FDE68A}
+.st-claimed{background:#D1FAE5;color:#065F46;border-color:#6EE7B7}
+.st-submitted{background:#DBEAFE;color:#1E3A8A;border-color:#93C5FD}
+.cn-r2{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.cn-r2 .chevron{color:#D1D5DB;font-size:10px;margin-left:auto;transition:transform .2s;display:inline-block}
+.cn-r2 .chevron.up{transform:rotate(180deg)}
+.cn-notes-preview{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px}
+
+.cn-body{border-top:1px solid #F3F4F6;padding:13px 14px;background:#FAFAFA;display:flex;flex-direction:column;gap:11px}
+.cn-body.is-claimed{background:#F0FDF4}
+.cn-body.is-submitted{background:#EFF6FF}
+
+/* ── FORM FIELDS ─────────────────────────────────── */
+.f-label{font-size:10px;font-weight:700;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:.05em;text-transform:uppercase}
+.f-input{
+  width:100%;border:1.5px solid var(--border);border-radius:9px;
+  padding:10px 12px;font-size:13px;outline:none;background:#fff;
+  transition:border-color .15s,box-shadow .15s;
+}
+.f-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,180,216,.1)}
+.f-input.err{border-color:var(--red)}
+.f-input::placeholder{color:#C4C9CF}
+.f-input:disabled{background:#F9FAFB;color:#9CA3AF}
+.f-textarea{
+  width:100%;border:1.5px solid var(--border);border-radius:9px;
+  padding:10px 12px;font-size:13px;outline:none;background:#fff;
+  resize:vertical;line-height:1.5;
+  transition:border-color .15s,box-shadow .15s;
+}
+.f-textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(0,180,216,.1)}
+.f-textarea.mono{font-family:'DM Mono',monospace;font-size:12px;line-height:1.65;background:#FAFAFA;min-height:180px}
+.f-textarea:disabled{background:#F9FAFB;color:#9CA3AF}
+.f-row{display:flex;gap:8px;align-items:stretch}
+.f-row .f-input{flex:1}
+
+/* ── BUTTONS ─────────────────────────────────────── */
+.btn{border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover:not(:disabled){opacity:.88}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-primary{background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;width:100%}
+.btn-danger{background:#FEF2F2;color:var(--red);border:1.5px solid #FECACA;width:100%}
+.btn-ghost{background:#F0F7FA;color:var(--indigo);border:1.5px solid rgba(0,180,216,.25)}
+.btn-sm{padding:6px 13px;font-size:12px;border-radius:8px;flex-shrink:0}
+.btn-submit-sm{background:var(--indigo);color:#fff;border-radius:9px;border:none;padding:0 14px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap;transition:opacity .15s;min-height:42px}
+.btn-submit-sm:hover{opacity:.88}
+.btn-submit-sm:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── INFO PILLS ──────────────────────────────────── */
+.info-pill{display:flex;align-items:center;gap:7px;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:600}
+.info-pill.green{background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7}
+.info-pill.blue{background:#DBEAFE;color:#1E3A8A;border:1px solid #93C5FD;overflow:hidden}
+.info-pill.blue a{color:#1D4ED8;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;text-decoration:none}
+.info-pill.blue a:hover{text-decoration:underline}
+.info-pill.yellow{background:#FEF9C3;color:#78350F;border:1px solid #FDE68A;font-size:11px}
+
+/* ── PLATFORM BADGE ──────────────────────────────── */
+.plat{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap;border:1px solid}
+.plat-Instagram{background:#fdf0f5;color:#E1306C;border-color:rgba(225,48,108,.15)}
+.plat-Instagram-Story,.plat-Instagram-\(Story\){background:#f5f0fd;color:#833AB4;border-color:rgba(131,58,180,.15)}
+.plat-Instagram-Reel{background:#fff3f0;color:#F56040;border-color:rgba(245,96,64,.15)}
+.plat-Facebook{background:#f0f5ff;color:#1877F2;border-color:rgba(24,119,242,.15)}
+.plat-TikTok{background:#f5f5f5;color:#111;border-color:rgba(0,0,0,.1)}
+
+/* ── STATUS BADGE ────────────────────────────────── */
+.sbadge{padding:3px 8px;border-radius:20px;font-size:9px;font-weight:800;border:1px solid;white-space:nowrap;cursor:pointer;transition:opacity .1s}
+.sbadge.ns{background:#F3F4F6;color:#6B7280;border-color:rgba(107,114,128,.2)}
+.sbadge.ip{background:#EFF6FF;color:#2563EB;border-color:rgba(37,99,235,.2)}
+.sbadge.sub{background:#FFFBEB;color:#D97706;border-color:rgba(217,119,6,.2)}
+.sbadge.dn{background:#ECFDF5;color:#059669;border-color:rgba(5,150,105,.2)}
+.sbadge.nc{cursor:default}
+
+/* ── CAL CARD ────────────────────────────────────── */
+.cal-card{background:#fff;border-radius:12px;border:1.5px solid var(--border);overflow:hidden;margin-bottom:8px;transition:box-shadow .2s}
+.cal-card.exp{box-shadow:0 4px 18px rgba(27,10,110,.09)}
+.cal-top{padding:11px 13px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.cal-meta{flex:1;min-width:0}
+.cal-badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:5px}
+.cal-title{font-size:13px;font-weight:600;color:var(--dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cal-title.wrap{white-space:normal}
+.cal-end{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.caret{color:#D1D5DB;font-size:10px;transition:transform .2s}
+.caret.up{transform:rotate(180deg)}
+.cal-body{border-top:1px solid #F3F4F6;padding:12px 13px;background:#FAFAFA;display:flex;flex-direction:column;gap:10px}
+.body-lbl{font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+.caption-pre{font-size:12px;color:#374151;white-space:pre-line;line-height:1.6;background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 12px;max-height:100px;overflow-y:auto;font-family:'DM Mono',monospace}
+.notes-txt{font-size:12px;color:#6B7280;line-height:1.5}
+.btn-write{width:100%;border:none;border-radius:10px;padding:11px;font-weight:700;font-size:13px;cursor:pointer;transition:opacity .15s}
+.btn-write.has{background:#F0F7FA;color:var(--indigo);border:1.5px solid rgba(0,180,216,.25)}
+.btn-write.no{background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff}
+.btn-write:hover{opacity:.88}
+
+/* ── PLAN DOCUMENT ───────────────────────────────── */
+.doc-wrap{font-family:'DM Sans',system-ui,sans-serif;color:var(--dark)}
+.doc-cover{background:linear-gradient(135deg,#1B0A6E 0%,#0D3B6E 55%,#007DA8 100%);border-radius:14px;padding:20px 18px 18px;margin-bottom:20px;color:#fff}
+.doc-cover-eyebrow{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.5;margin-bottom:6px}
+.doc-cover-title{font-size:18px;font-weight:800;line-height:1.2;margin-bottom:4px}
+.doc-cover-sub{font-size:12px;opacity:.65;margin-bottom:12px}
+.doc-cover-chips{display:flex;gap:6px;flex-wrap:wrap}
+.doc-cover-chip{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:600}
+.doc-section{margin-bottom:22px}
+.doc-h1{font-size:15px;font-weight:800;color:var(--indigo);letter-spacing:-.2px;margin-bottom:10px;padding-bottom:7px;border-bottom:2px solid rgba(27,10,110,.1)}
+.doc-h2{font-size:12px;font-weight:800;color:var(--grey);letter-spacing:.07em;text-transform:uppercase;margin:14px 0 7px}
+.doc-p{font-size:13px;color:#374151;line-height:1.65;margin-bottom:8px}
+.doc-callout{background:#F0F7FA;border-left:3px solid var(--blue);border-radius:0 9px 9px 0;padding:10px 13px;font-size:12px;color:var(--indigo);font-weight:600;line-height:1.5;margin-bottom:10px}
+.doc-week-band{display:flex;align-items:stretch;border-radius:11px;overflow:hidden;margin-bottom:16px;border:1.5px solid var(--border)}
+.doc-week-accent{width:5px;flex-shrink:0}
+.doc-week-body{flex:1;padding:13px 14px}
+.doc-week-label{font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin-bottom:2px}
+.doc-week-theme{font-size:14px;font-weight:800;color:var(--dark);margin-bottom:3px}
+.doc-week-goal{font-size:11px;color:#6B7280;line-height:1.4}
+.doc-plat-row{margin-bottom:10px}
+.doc-plat-lbl{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.doc-plat-name{font-size:11px;font-weight:800}
+.doc-post-list{list-style:none;padding:0;margin:0}
+.doc-post-list li{display:flex;gap:8px;align-items:baseline;padding:4px 0;border-bottom:1px solid #F9FAFB;font-size:12px;color:#374151;line-height:1.5}
+.doc-post-list li:last-child{border-bottom:none}
+.doc-post-num{font-size:10px;font-weight:800;color:var(--muted);flex-shrink:0;width:14px;text-align:right}
+.doc-post-type{font-size:9px;font-weight:800;border-radius:4px;padding:1px 5px;flex-shrink:0;margin-top:1px}
+.doc-post-text{flex:1}
+.doc-post-cta{font-size:11px;font-style:italic;margin-top:1px}
+.doc-action-list{list-style:none;padding:0;margin:0}
+.doc-action-list li{display:flex;gap:8px;padding:5px 0;font-size:12px;color:#374151;line-height:1.5;border-bottom:1px solid #F9FAFB}
+.doc-action-list li:last-child{border-bottom:none}
+.doc-action-list li::before{content:"□";font-size:13px;color:var(--indigo);flex-shrink:0;margin-top:1px}
+.doc-kpi-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #F3F4F6;font-size:12px}
+.doc-kpi-row:last-child{border-bottom:none}
+.doc-divider{height:1px;background:var(--border);margin:18px 0}
+.doc-tagline{text-align:center;font-size:11px;font-style:italic;color:var(--muted);padding:8px 0 4px}
+
+/* ── WEEK PLAN ───────────────────────────────────── */
+
+.wk-eyebrow{font-size:10px;font-weight:700;letter-spacing:.1em;opacity:.55;margin-bottom:3px;text-transform:uppercase}
+.wk-theme{font-size:16px;font-weight:800;margin-bottom:5px}
+.wk-desc{font-size:12px;opacity:.75;margin-bottom:5px;line-height:1.4}
+.wk-goal{font-size:11px;opacity:.6;line-height:1.4}
+
+
+/* ── MODAL ───────────────────────────────────────── */
+.overlay{position:fixed;inset:0;background:rgba(10,5,40,.75);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center;z-index:1000;animation:fadeIn .18s ease}
+.sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:93vh;overflow-y:auto;box-shadow:0 -8px 40px rgba(27,10,110,.3);animation:slideUp .22s ease;padding-bottom:max(16px,env(safe-area-inset-bottom))}
+.sheet-handle{display:flex;justify-content:center;padding:11px 0 0}
+.handle-bar{width:34px;height:4px;background:#E5E7EB;border-radius:2px}
+.sheet-hdr{padding:11px 18px 14px;border-bottom:1px solid #F3F4F6;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.sheet-title{font-weight:800;font-size:15px;color:var(--indigo)}
+.btn-close{background:#F3F4F6;border:none;color:#6B7280;width:30px;height:30px;border-radius:7px;font-size:16px;cursor:pointer;flex-shrink:0}
+.sheet-body{padding:14px 18px;display:flex;flex-direction:column;gap:13px}
+.concept-pill{background:#F0F7FA;border-radius:9px;padding:9px 13px;font-size:13px;color:var(--indigo);font-weight:600;line-height:1.4}
+.btn-gen{width:100%;border:none;border-radius:11px;padding:13px;font-weight:800;font-size:14px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:7px}
+.btn-gen.ready{background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff}
+.btn-gen.loading{background:#E5E7EB;color:#9CA3AF;cursor:not-allowed}
+.btn-gen:disabled{cursor:not-allowed}
+.err-box{background:#FEF2F2;border:1px solid #FCA5A5;border-radius:8px;padding:10px 12px;font-size:12px;color:var(--red);line-height:1.4}
+.action-row{display:flex;gap:8px}
+.action-btn{flex:1;border-radius:10px;padding:11px 8px;font-weight:700;font-size:12px;cursor:pointer;border:1.5px solid;transition:opacity .15s;text-align:center}
+.action-btn:hover{opacity:.88}
+.action-btn.draft{background:#F0F7FA;color:var(--indigo);border-color:rgba(0,180,216,.25)}
+.action-btn.submit{background:#FFFBEB;color:var(--amber);border-color:#FCD34D}
+.action-btn.approve{width:100%;background:#ECFDF5;color:var(--green);border-color:#6EE7B7;font-size:14px;padding:13px;font-weight:800}
+
+/* ── EMPTY STATE ─────────────────────────────────── */
+.empty{text-align:center;padding:44px 20px;color:var(--muted)}
+.empty-icon{font-size:34px;margin-bottom:11px}
+.empty-title{font-size:14px;font-weight:700;color:var(--grey);margin-bottom:6px}
+.empty-desc{font-size:12px;line-height:1.5}
+
+/* ── SPINNERS ────────────────────────────────────── */
+.spin{width:15px;height:15px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite}
+.spin-sm{width:10px;height:10px;border-radius:50%;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;animation:spin .7s linear infinite}
+.spin-dark{width:13px;height:13px;border-radius:50%;border:2px solid rgba(27,10,110,.15);border-top-color:var(--indigo);animation:spin .7s linear infinite}
+
+/* ── CALENDAR GRID ───────────────────────────────── */
+.cal-week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px;overflow-x:auto}
+.cal-day-col{min-width:42px}
+.cal-day-hdr{text-align:center;padding:6px 2px 4px;border-radius:8px 8px 0 0}
+.cal-day-name{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.cal-day-num{font-size:17px;font-weight:800;color:var(--dark);line-height:1.1;margin-top:1px}
+.cal-day-hdr.today .cal-day-name{color:var(--blue)}
+.cal-day-hdr.today .cal-day-num{color:var(--indigo)}
+.cal-day-hdr.today{background:rgba(0,180,216,.07);border-radius:8px;padding:6px 4px 4px}
+.cal-day-slots{display:flex;flex-direction:column;gap:4px;min-height:40px;padding:4px 0}
+.cal-slot{border-radius:7px;padding:5px 6px;cursor:pointer;border:1.5px solid transparent;transition:opacity .12s}
+.cal-slot:hover{opacity:.85}
+.cal-slot-ig{background:#fdf0f5;border-color:rgba(225,48,108,.2)}
+.cal-slot-story{background:#f5f0fd;border-color:rgba(131,58,180,.2)}
+.cal-slot-fb{background:#f0f5ff;border-color:rgba(24,119,242,.2)}
+.cal-slot-tt{background:#f5f5f5;border-color:rgba(0,0,0,.1)}
+.cal-slot-dot{width:6px;height:6px;border-radius:50%;margin-bottom:3px}
+.cal-slot-lbl{font-size:8px;font-weight:700;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cal-slot-status{display:flex;align-items:center;gap:2px;margin-top:3px}
+.cal-slot-sbar{height:3px;border-radius:2px;flex:1}
+.cal-unscheduled{margin-top:4px}
+.cal-unsched-hdr{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;padding:0 2px}
+
+/* ── NOTION LINK BUTTON ──────────────────────────── */
+.btn-notion{display:inline-flex;align-items:center;gap:5px;background:#F8F6FF;border:1.5px solid rgba(27,10,110,.15);border-radius:9px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--indigo);text-decoration:none;transition:opacity .12s;width:100%;justify-content:center}
+.btn-notion:hover{opacity:.82}
+
+/* ── NEED CONTENT TOGGLE (admin only) ────────────── */
+.nc-toggle-row{display:flex;align-items:center;justify-content:space-between;background:#FFFBEB;border:1px solid #FDE68A;border-radius:9px;padding:9px 12px}
+.nc-toggle-label{font-size:12px;font-weight:600;color:#78350F}
+.toggle{position:relative;display:inline-block;width:38px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;cursor:pointer;inset:0;background:#D1D5DB;border-radius:22px;transition:.2s}
+.toggle-slider:before{position:absolute;content:"";height:16px;width:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+input:checked+.toggle-slider{background:var(--indigo)}
+input:checked+.toggle-slider:before{transform:translateX(16px)}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="hdr">
+    <div class="hdr-top">
+      <div class="hdr-logo">
+        <img class="hdr-logo-img" src="https://elevatesyracuse.com/app/uploads/2025/10/Pink-White-Playful-Celebratory-Drive-by-Graduation-Banner.png" alt="Elevate Fitness" onerror="this.style.display='none'"/>
+        <div>
+          <div class="hdr-wordmark">Content Hub</div>
+          <div class="hdr-sub" id="hdr-sub">DeWitt &amp; Liverpool · <span id="hdr-month"></span></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="hdr-bot">
+      <div id="sync-info">Not yet synced</div>
+      <button id="sync-btn">↑ Sync Notion</button>
+    </div>
+  </div>
+
+  <div id="tabs">
+    <button class="tab active" data-tab="needed">🎬 Needed</button>
+    <button class="tab" data-tab="calendar">📅 Calendar</button>
+    <button class="tab" data-tab="plan">🗓 Plan</button>
+  </div>
+
+  <div id="main"></div>
+
+  <div id="foot">
+    <span class="foot-l">Real people. Real fitness. Real community.</span>
+    <span class="foot-r">elevatesyracuse.com</span>
+  </div>
+</div>
+<div id="modal"></div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DATA
+══════════════════════════════════════════════════ */
+const PLAT_ICON = {Instagram:"📸","Instagram (Story)":"⭕","Instagram Reel":"🎬",Facebook:"👥",TikTok:"🎵"};
+const PLAT_COLOR = {
+  Instagram:{t:"#E1306C",bg:"rgba(225,48,108,.08)"},
+  "Instagram (Story)":{t:"#833AB4",bg:"rgba(131,58,180,.08)"},
+  "Instagram Reel":{t:"#F56040",bg:"rgba(245,96,64,.08)"},
+  Facebook:{t:"#1877F2",bg:"rgba(24,119,242,.08)"},
+  TikTok:{t:"#111",bg:"rgba(0,0,0,.05)"}
+};
+const STAT_CYCLE = {"Not started":"In progress","In progress":"Submitted","Submitted":"Done","Done":"Not started"};
+const STAT_CLS = {"Not started":"ns","In progress":"ip","Submitted":"sub","Done":"dn"};
+
+/* ══════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════ */
+let S = {
+  tab: "needed",
+
+  filterPlat: "All",
+  filterStat: "All",
+
+  expPosts: new Set(),
+  expNeeded: new Set(),
+  modalId: null,
+  syncing: false,
+  syncDone: false,
+  lastSync: null,
+  posts: []   // populated exclusively from Notion sync — never hardcoded
+};
+
+/* ══════════════════════════════════════════════════
+   UTILITIES
+══════════════════════════════════════════════════ */
+const esc = s => String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+function platBadge(p){
+  const key = p.replace(/[^a-zA-Z]/g,'-');
+  const icon = PLAT_ICON[p] || '📱';
+  return `<span class="plat plat-${key}">${icon} ${esc(p)}</span>`;
+}
+
+function statBadge(s, clickable){
+  const cls = STAT_CLS[s] || 'ns';
+  return `<button class="sbadge ${cls}${clickable?'':' nc'}" ${clickable?'onclick="cycleStatus(event)"':''}>${esc(s||'Not started')}</button>`;
+}
+
+// All users have full access — role toggle removed
+const canCycle = () => true;
+const canEdit   = () => true;
+const canApprove = () => true;
+
+/* ══════════════════════════════════════════════════
+   NOTION SYNC — via Cloudflare Worker proxy
+   Proxy repo: see worker.js in your deployment
+══════════════════════════════════════════════════ */
+
+// ⚠️  Update this to your Worker URL after deploying to Cloudflare
+const PROXY = "https://elevate-notion-proxy.jason-marketing-fixer.workers.dev";
+const ALLOWED_ORIGIN = "https://jasonmarketingfixer-glitch.github.io";
+const DB_CURRENT = "24c3728fa92680f0ba7ac2f76c641683";
+const DB_NEXT    = "3203728fa92680f384aad2552712eb3f";
+
+let nextWeekItems = [];
+let syncErrors    = [];
+
+// Query a Notion database via proxy
+async function notionQueryDB(dbId, filter){
+  const body = filter ? {filter} : {};
+  const pages = [];
+  let cursor;
+  do {
+    const payload = { ...body, page_size: 100 };
+    if (cursor) payload.start_cursor = cursor;
+    const res = await fetch(`${PROXY}/query/${dbId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || err.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    pages.push(...(data.results || []));
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while (cursor);
+  return pages;
+}
+
+// Update a Notion page via proxy
+async function notionUpdatePage(pageId, properties){
+  const res = await fetch(`${PROXY}/pages/${pageId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ properties }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || err.message || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// Extract a typed property value from a raw Notion page object
+function notionProp(page, key){
+  const p = page.properties?.[key];
+  if (!p) return null;
+  switch (p.type) {
+    case 'title':     return p.title?.map(t => t.plain_text).join('') || '';
+    case 'rich_text': return p.rich_text?.map(t => t.plain_text).join('') || '';
+    case 'select':    return p.select?.name || '';
+    case 'status':    return p.status?.name || '';
+    case 'checkbox':  return p.checkbox === true;
+    case 'url':       return p.url || '';
+    case 'date':      return p.date?.start || null;
+    case 'files':     return (p.files || []).length > 0;
+    default:          return null;
+  }
+}
+
+// Build a Notion property patch payload from a plain update map
+function buildNotionProps(updates){
+  const props = {};
+  for (const [k, v] of Object.entries(updates)) {
+    if (k === 'Status')
+      props[k] = { status: { name: v } };
+    else if (['Caption', 'Claimed By', 'Notes'].includes(k))
+      props[k] = { rich_text: [{ text: { content: String(v) } }] };
+    else if (k === 'Content Link')
+      props[k] = { url: v || null };
+    else if (k === 'Need Content')
+      props[k] = { checkbox: !!v };
+  }
+  return props;
+}
+
+async function syncNotion(){
+  if(S.syncing) return;
+  S.syncing = true;
+  syncErrors = [];
+  const btn = document.getElementById('sync-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin-sm"></div> Syncing…';
+
+  const [nextRes, curRes] = await Promise.allSettled([
+    notionQueryDB(DB_NEXT),
+    notionQueryDB(DB_CURRENT),
+  ]);
+
+  if(nextRes.status === 'fulfilled'){
+    nextWeekItems = nextRes.value.map((page, i) => ({
+      id: 'nw-' + i,
+      pageId: page.id,
+      notionUrl: page.url || '',
+      title: notionProp(page, 'Notes') || '(Untitled)',
+      platform: notionProp(page, 'Platform') || '',
+      notes: notionProp(page, 'Notes') || '',
+      status: notionProp(page, 'Status') || 'Not started',
+      claimedBy: notionProp(page, 'Claimed By') || '',
+      contentLink: notionProp(page, 'Content Link') || '',
+      needContent: notionProp(page, 'Need Content') === true,
+    }));
+  } else {
+    syncErrors.push('Next week DB: ' + (nextRes.reason?.message || nextRes.reason));
+  }
+
+  if(curRes.status === 'fulfilled'){
+    S.posts = curRes.value.map((page, i) => ({
+      id: 'cw-' + i,
+      pageId: page.id,
+      notionUrl: page.url || '',
+      title: notionProp(page, 'Week of March 9, 2025') || '(Untitled)',
+      platform: notionProp(page, 'Platform') || '',
+      type: notionProp(page, 'Platform') || '',
+      status: notionProp(page, 'Status') || 'Not started',
+      caption: notionProp(page, 'Caption') || '',
+      notes: notionProp(page, 'Notes') || '',
+      date: notionProp(page, 'Date') || null,
+      needContent: notionProp(page, 'Need Content') === true,
+      claimedBy: notionProp(page, 'Claimed By') || '',
+      contentLink: notionProp(page, 'Content Link') || '',
+      hasPost: notionProp(page, 'Post') === true,
+    }));
+  } else {
+    syncErrors.push('Current week DB: ' + (curRes.reason?.message || curRes.reason));
+  }
+
+  S.syncDone = true;
+  S.lastSync = new Date();
+  S.syncing = false;
+  btn.disabled = false;
+
+  if(syncErrors.length){
+    btn.innerHTML = '⚠️ Sync error';
+    document.getElementById('sync-info').textContent = syncErrors[0];
+    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 5000);
+  } else {
+    btn.innerHTML = '✓ Synced';
+    document.getElementById('sync-info').textContent = `Synced ${S.lastSync.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
+    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 3000);
+  }
+  render();
+}
+
+async function writeNotion(item, updates){
+  if(!item?.pageId) return;
+  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
+}
+
+async function writeCalNotion(item, updates){
+  if(!item?.pageId) return;
+  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
+}
+
+/* ══════════════════════════════════════════════════
+   CONTENT NEEDED TAB
+══════════════════════════════════════════════════ */
+function renderNeeded(){
+  // Show sync errors prominently if any
+  const errBanner = syncErrors.length
+    ? `<div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#991B1B;line-height:1.5">
+        <strong>⚠️ Sync error</strong><br>${syncErrors.map(e=>`<div style="margin-top:4px;font-family:monospace;font-size:11px;word-break:break-all">${esc(e)}</div>`).join('')}
+       </div>`
+    : '';
+
+  // Not yet synced
+  if(!S.syncDone){
+    return `${errBanner}<div class="empty">
+      <div class="empty-icon">🔄</div>
+      <div class="empty-title">Sync to load content requests</div>
+      <div class="empty-desc">Tap <strong>↑ Sync Notion</strong> above to pull from your <em>Elevate Fitness (next week planning)</em> database. Only rows with the <strong>"Need Content"</strong> checkbox checked will appear here.</div>
+    </div>`;
+  }
+
+  const all = nextWeekItems.filter(p => p.needContent === true);
+
+  if(!all.length){
+    return `${errBanner}<div class="empty">
+      <div class="empty-icon">✅</div>
+      <div class="empty-title">No content requests right now</div>
+      <div class="empty-desc">In Notion, check the <strong>"Need Content"</strong> box on any row in <em>Elevate Fitness (next week planning)</em> to surface it here for the team to claim.</div>
+    </div>`;
+  }
+
+  let html = errBanner;
+  all.forEach(p => { html += needCard(p); });
+  return html;
+}
+
+function needCard(p){
+  const exp = S.expNeeded.has(p.id);
+  const isClaimed   = !!p.claimedBy;
+  const isSubmitted = !!p.contentLink;
+
+  let cardCls = '', topPillCls = 'st-open', topPillLabel = 'Open';
+  if(isSubmitted){ cardCls='is-submitted'; topPillCls='st-submitted'; topPillLabel='✓ Submitted'; }
+  else if(isClaimed){ cardCls='is-claimed'; topPillCls='st-claimed'; topPillLabel=`Claimed`; }
+
+  let body = '';
+  if(exp){
+    let bodyCls = isSubmitted ? 'is-submitted' : isClaimed ? 'is-claimed' : '';
+    body += `<div class="cn-body ${bodyCls}">`;
+
+    // Content brief
+    if(p.notes){
+      body += `<div>
+        <label class="f-label">Content Brief</label>
+        <div style="font-size:13px;color:#374151;line-height:1.6;background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px">${esc(p.notes)}</div>
+      </div>`;
+    }
+
+    if(!isSubmitted){
+      if(!isClaimed){
+        // Claim form
+        body += `<div>
+          <label class="f-label">Your Name</label>
+          <div class="f-row">
+            <input class="f-input" id="name-${p.id}" type="text" placeholder="Enter your name to claim this…" style="min-height:42px"/>
+            <button class="btn-submit-sm" onclick="claimPost('${p.id}')">Claim it →</button>
+          </div>
+        </div>`;
+      } else {
+        // Claimed by — show + unclaim
+        body += `<div class="info-pill green">👤 Claimed by <strong style="margin-left:3px">${esc(p.claimedBy)}</strong>
+          ${canEdit()?`<button onclick="unclaimPost('${p.id}')" style="margin-left:auto;background:none;border:none;color:var(--red);font-size:11px;font-weight:700;cursor:pointer;padding:0">Unclaim</button>`:''}
+        </div>`;
+
+        // Drive link submission
+        body += `<div>
+          <label class="f-label">Paste Google Drive Link</label>
+          <div class="f-row">
+            <input class="f-input" id="link-${p.id}" type="url" placeholder="https://drive.google.com/…" style="min-height:42px"/>
+            <button class="btn-submit-sm" onclick="submitLink('${p.id}')">Submit →</button>
+          </div>
+          <div style="font-size:10px;color:var(--muted);margin-top:5px">⚠️ Set the Drive file to "Anyone with the link can view" before submitting.</div>
+        </div>`;
+      }
+    } else {
+      // Submitted — show info + link
+      body += `<div class="info-pill green">👤 ${esc(p.claimedBy)} · Content submitted</div>`;
+      body += `<div class="info-pill blue">🔗 <a href="${esc(p.contentLink)}" target="_blank" rel="noopener">View submitted content ↗</a></div>`;
+
+      // Admin: allow link update
+      if(canEdit()){
+        body += `<div>
+          <label class="f-label">Update Link</label>
+          <div class="f-row">
+            <input class="f-input" id="link-${p.id}" type="url" placeholder="Paste updated Drive link…" value="${esc(p.contentLink)}" style="min-height:42px"/>
+            <button class="btn-submit-sm" onclick="submitLink('${p.id}')">Update</button>
+          </div>
+        </div>`;
+      }
+    }
+
+    // Remove from Content Needed (always visible — only you are accessing this app)
+    body += `<button class="btn btn-danger" onclick="toggleNeedContent('${p.id}')">✕ Remove from Content Needed</button>`;
+
+    body += `</div>`;
+  }
+
+  return `<div class="cn-card ${cardCls}" id="cn-${p.id}">
+    <div class="cn-top" onclick="toggleNeeded('${p.id}')">
+      <div class="cn-r1">
+        <div class="cn-title">${esc(p.title)}</div>
+        <span class="st-pill ${topPillCls}">${topPillLabel}</span>
+      </div>
+      <div class="cn-r2">
+        ${p.platform ? platBadge(p.platform) : ''}
+        <span class="chevron${exp?' up':''}">▼</span>
+      </div>
+      ${!exp && p.notes ? `<div class="cn-notes-preview">${esc(p.notes.length>95 ? p.notes.slice(0,95)+'…' : p.notes)}</div>` : ''}
+    </div>
+    ${body}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   CALENDAR TAB — Weekly Grid View (live from Notion)
+══════════════════════════════════════════════════ */
+function renderCalendar(){
+  // Gate: prompt sync if no live data yet
+  if(!S.lastSync){
+    return `<div class="empty">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">Sync to load this week's calendar</div>
+      <div class="empty-desc">Tap <strong>↑ Sync Notion</strong> above to pull live posts from <em>Elevate Fitness (current week)</em> in Notion.</div>
+    </div>`;
+  }
+
+  if(!S.posts.length){
+    return `<div class="empty">
+      <div class="empty-icon">✅</div>
+      <div class="empty-title">No posts in the current week database</div>
+      <div class="empty-desc">Add rows to <em>Elevate Fitness (current week)</em> in Notion, then sync again.</div>
+    </div>`;
+  }
+
+  // Progress bar
+  const doneCount = S.posts.filter(p=>p.status==='Done').length;
+  const pct = S.posts.length ? Math.round((doneCount/S.posts.length)*100) : 0;
+  const DOT = {"Not started":"#6B7280","In progress":"#2563EB","Submitted":"#D97706","Done":"#059669"};
+  const sCts = {};
+  ["Not started","In progress","Submitted","Done"].forEach(s=>{ sCts[s]=S.posts.filter(p=>p.status===s).length; });
+
+  let html = `<div class="prog-card">
+    <div class="prog-hdr"><span class="prog-label">This Week</span><span class="prog-val">${doneCount}/${S.posts.length} done · ${pct}%</span></div>
+    <div class="prog-bar-bg"><div class="prog-bar" style="width:${pct}%"></div></div>
+    <div class="prog-dots">${["Not started","In progress","Submitted","Done"].map(s=>`<div class="prog-dot"><div class="dot" style="background:${DOT[s]}"></div>${s}: <strong>${sCts[s]||0}</strong></div>`).join('')}</div>
+  </div>`;
+
+  // Platform filter chips only (status filter removed for clean calendar view)
+  const plats = ["All","Instagram","Facebook","TikTok"];
+  html += `<div class="chips">${plats.map(p=>`<button class="chip${S.filterPlat===p?' ap':''}" onclick="setFP('${p}')">${PLAT_ICON[p]||'📱'} ${p}</button>`).join('')}</div>`;
+
+  const filtered = S.posts.filter(p => S.filterPlat==='All' || p.platform===S.filterPlat || p.platform.startsWith(S.filterPlat));
+
+  // --- Build Mon–Sun grid for current week ---
+  // Derive week start from today (March 2026 context) or first dated post
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Sun
+  const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() + mondayOffset);
+  weekStart.setHours(0,0,0,0);
+
+  const days = Array.from({length:7},(_,i)=>{
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate()+i);
+    return d;
+  });
+
+  const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  // Slot posts by date
+  const byDate = {};
+  const unscheduled = [];
+  filtered.forEach(p => {
+    if(p.date){
+      const key = p.date.slice(0,10);
+      (byDate[key]||(byDate[key]=[])).push(p);
+    } else {
+      unscheduled.push(p);
+    }
+  });
+
+  // Helper: status color
+  function slotColor(status){
+    return DOT[status]||DOT['Not started'];
+  }
+
+  // Helper: platform slot CSS class
+  function slotCls(platform){
+    if(platform.startsWith('Instagram(Story)')||platform==='Instagram (Story)') return 'cal-slot-story';
+    if(platform.startsWith('Instagram')) return 'cal-slot-ig';
+    if(platform==='Facebook') return 'cal-slot-fb';
+    if(platform==='TikTok') return 'cal-slot-tt';
+    return 'cal-slot-ig';
+  }
+
+  // Build grid
+  html += `<div class="cal-week-grid">`;
+  days.forEach((d,i) => {
+    const key = d.toISOString().slice(0,10);
+    const isToday = d.toDateString() === today.toDateString();
+    const posts = byDate[key]||[];
+    html += `<div class="cal-day-col">
+      <div class="cal-day-hdr${isToday?' today':''}">
+        <div class="cal-day-name">${DAY_NAMES[i]}</div>
+        <div class="cal-day-num">${d.getDate()}</div>
+      </div>
+      <div class="cal-day-slots">`;
+    posts.forEach(p => {
+      html += `<div class="${'cal-slot '+slotCls(p.platform)}" onclick="toggleExpand('${p.id}')" title="${esc(p.title)}">
+        <div class="cal-slot-dot" style="background:${slotColor(p.status)}"></div>
+        <div class="cal-slot-lbl" style="color:${p.platform==='TikTok'?'#111':p.platform.startsWith('Facebook')?'#1877F2':p.platform==='Instagram (Story)'?'#833AB4':'#E1306C'}">${esc(p.title)}</div>
+        <div class="cal-slot-status"><div class="cal-slot-sbar" style="background:${slotColor(p.status)}"></div></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+
+  // Expanded card detail — shown below grid when a slot is tapped
+  const expandedPosts = filtered.filter(p => S.expPosts.has(p.id) && p.date);
+  const expandedUnsched = filtered.filter(p => S.expPosts.has(p.id) && !p.date);
+  [...expandedPosts, ...expandedUnsched].forEach(p => {
+    html += calCard(p);
+  });
+
+  // Unscheduled posts
+  if(unscheduled.length){
+    html += `<div class="cal-unscheduled">
+      <div class="cal-unsched-hdr">📌 Unscheduled (${unscheduled.length})</div>`;
+    unscheduled.forEach(p => { html += calCard(p); });
+    html += `</div>`;
+  }
+
+  return html;
+}
+
+function calCard(p){
+  const exp = S.expPosts.has(p.id);
+  const cc  = canCycle();
+  let body  = '';
+  if(exp){
+    body = `<div class="cal-body">`;
+    if(p.caption) body += `<div><div class="body-lbl">Caption</div><div class="caption-pre">${esc(p.caption)}</div></div>`;
+    else if(p.notes) body += `<div><div class="body-lbl">Notes</div><div class="notes-txt">${esc(p.notes)}</div></div>`;
+    if(p.cta) body += `<div style="font-size:12px;color:var(--indigo);font-weight:600;background:#F0F7FA;border-radius:8px;padding:7px 10px">🎯 ${esc(p.cta)}</div>`;
+
+    // Notion link — always shown, label changes based on whether creative is attached
+    if(p.notionUrl){
+      const label = p.hasPost ? '🎬 View Creative in Notion ↗' : '📄 Open in Notion ↗';
+      body += `<a class="btn-notion" href="${esc(p.notionUrl)}" target="_blank" rel="noopener">${label}</a>`;
+    }
+
+    if(p.needContent) body += `<div class="info-pill yellow">🎬 Creative needed — check the <strong>Needed</strong> tab</div>`;
+    body += `</div>`;
+  }
+  return `<div class="cal-card${exp?' exp':''}" id="card-${p.id}">
+    <div class="cal-top" onclick="toggleExpand('${p.id}')">
+      <div class="cal-meta">
+        <div class="cal-badges">
+          ${platBadge(p.platform)}
+          ${p.date?`<span style="font-size:10px;color:var(--muted);font-weight:600">${new Date(p.date+'T12:00:00').toLocaleDateString([],{month:'short',day:'numeric'})}</span>`:'<span style="font-size:9px;background:#FEF9C3;color:#78350F;border:1px solid #FDE68A;padding:1px 6px;border-radius:10px;font-weight:700">Unscheduled</span>'}
+          ${p.hasPost?'<span style="font-size:9px;background:#D1FAE5;color:#065F46;border:1px solid #6EE7B7;padding:1px 6px;border-radius:10px;font-weight:700">✓ Creative</span>':''}
+          ${p.needContent?'<span style="font-size:9px;background:#FEF9C3;color:#78350F;border:1px solid #FDE68A;padding:1px 6px;border-radius:10px;font-weight:800">NEEDS CONTENT</span>':''}
+        </div>
+        <div class="cal-title${exp?' wrap':''}">${esc(p.title)}</div>
+      </div>
+      <div class="cal-end">${statBadge(p.status, cc)}<span class="caret${exp?' up':''}">▼</span></div>
+    </div>
+    ${body}
+  </div>`;
+}
+
+/* ══════════════════════════════════════════════════
+   PLAN TAB — 30-Day Action Plan Reference
+══════════════════════════════════════════════════ */
+
+const PLAN_DATA = {
+  meta: {
+    title: "30-Day Social Media Action Plan",
+    subtitle: "Building Engagement, Community & Lead Generation",
+    platforms: "Instagram · Facebook · TikTok",
+    tagline: "Real people. Real fitness. Real community.",
+    startDate: "March 9, 2026",
+  },
+  strategy: {
+    ctaExamples: [
+      {soft:"Book a free tour", does:"Gets them in the building"},
+      {soft:"Try a class on us", does:"Lets them experience the energy"},
+      {soft:"Claim your guest pass", does:"Creates a low-barrier entry point"},
+      {soft:"Explore our recovery center", does:"Leads with a unique differentiator"},
+      {soft:"See what makes us different", does:"Drives traffic to elevatesyracuse.com"},
+    ],
+    mix: [
+      {pct:"60%", cat:"Value Content", eg:"Trainer tips, workout demos, recovery education, swim safety, nutrition basics"},
+      {pct:"30%", cat:"Lifestyle & Community", eg:"Member spotlights, class energy clips, staff intros, behind-the-scenes, local tie-ins"},
+      {pct:"10%", cat:"Direct Lead Gen", eg:"Tour invitations, guest pass offers, recovery center open house, free trial pushes"},
+    ],
+  },
+  weeks: [
+    {
+      w:1, theme:"This is Elevate.", color:"#1B0A6E",
+      goal:"Establish visual identity, build initial engagement, and launch TikTok.",
+      instagram:[
+        {type:"Carousel", title:"5 Things You Didn't Know About Elevate", cta:"Tap the link in bio to book a free tour."},
+        {type:"Reel",     title:"60-sec cinematic walkthrough — Liverpool (indoor track wow-factor)", cta:"This isn't your average gym. See for yourself."},
+        {type:"Static",  title:'"More than a gym." brand graphic', cta:"What does fitness mean to you? Tell us below."},
+        {type:"Reel",    title:"Trainer intro — '3 things about me'", cta:"Want to train with [Name]? Try a session free."},
+        {type:"Carousel",title:"Recovery isn't optional — sauna, compression, red light", cta:"Explore our recovery center — link in bio."},
+      ],
+      facebook:[
+        {type:"Photo Album",  title:"Welcome to Elevate — 6–8 photos of both locations", cta:"Book your free tour at elevatesyracuse.com."},
+        {type:"Question",     title:"What's the one thing that keeps you coming back to the gym?", cta:"Drop your answer below!"},
+        {type:"Share Reel",   title:"Walkthrough Reel shared natively to Facebook", cta:"See what makes us different."},
+        {type:"Local Tie-in", title:"Proud to be part of the Syracuse community since [year].", cta:""},
+      ],
+      tiktok:[
+        {type:"Video", title:'"People think we\'re just a gym…" transition reveal', cta:""},
+        {type:"Video", title:'"Things my trainer says during class" — humor-driven', cta:""},
+        {type:"Video", title:'"Day in the life at Elevate" — member POV, 20–30 sec', cta:""},
+        {type:"Video", title:"Recovery routine after leg day — recovery center footage", cta:""},
+        {type:"Video", title:'"Syracuse\'s best-kept fitness secret" — hook-driven reveal', cta:""},
+      ],
+      actions:[
+        "Set up Linktree with: Book a Tour, Class Schedule, Recovery Info, Guest Pass",
+        "Optimize Instagram bio: name, tagline, location, link",
+        "Optimize TikTok profile: bio, photo, link to elevatesyracuse.com",
+        "Follow 50–100 local Syracuse accounts across all three platforms",
+        "Respond to every comment within 24 hours",
+      ],
+    },
+    {
+      w:2, theme:"We know fitness. Let us show you.", color:"#0D4B8E",
+      goal:"Drive engagement through value-first content. Build trainer personal brands.",
+      instagram:[
+        {type:"Reel",    title:'"3 mistakes you\'re making on the leg press" — educational', cta:"Save this for your next workout."},
+        {type:"Carousel",title:'"Your first week at Elevate" — step-by-step new member guide', cta:"Ready for your first week? Book a free tour."},
+        {type:"Reel",    title:"Class energy clip — packed spin or group fitness", cta:"Try a class on us. Tap the link."},
+        {type:"Static",  title:"Member spotlight — photo + quote (with permission)", cta:"Every story starts somewhere. Start yours at Elevate."},
+        {type:"Reel",    title:'"5 reasons to try recovery after your workout"', cta:"Explore recovery at elevatesyracuse.com."},
+      ],
+      facebook:[
+        {type:"Trainer Spotlight", title:"Meet [Name] — our [specialty] expert", cta:""},
+        {type:"Educational",       title:'"Why recovery is the missing piece of your fitness routine"', cta:"Learn more at elevatesyracuse.com."},
+        {type:"Share",             title:"Member spotlight from Instagram + personal note from Team Elevate", cta:""},
+        {type:"Engagement",        title:'"What class should we spotlight next?"', cta:"Drop your favorite below!"},
+      ],
+      tiktok:[
+        {type:"Video", title:'"Things that just hit different at Elevate" — montage, trending audio', cta:""},
+        {type:"Video", title:'Trainer myth-buster — "Lifting heavy won\'t make you bulky"', cta:""},
+        {type:"Video", title:'"POV: You finally try the recovery center"', cta:""},
+        {type:"Video", title:'"What I eat in a day as a trainer at Elevate"', cta:""},
+        {type:"Video", title:"Stitch or duet a trending fitness creator with Elevate's take", cta:""},
+      ],
+      actions:[
+        "Collect 2–3 member testimonials (written + video if possible) — get signed consent",
+        "Engage 15–20 min daily: comment on local accounts, reply to Stories, like relevant posts",
+        "Track which posts generate the most saves and shares — these signal value to the algorithm",
+      ],
+    },
+    {
+      w:3, theme:"We're your neighbors.", color:"#007DA8",
+      goal:"Increase shares, tags, and local engagement. Position Elevate as a community hub.",
+      instagram:[
+        {type:"Carousel",title:'"Why Syracuse trains at Elevate" — member quotes + local pride', cta:"Tag a friend who should check us out."},
+        {type:"Reel",    title:'"What happens at Elevate after 6 PM" — evening energy', cta:"Come see for yourself. Tour link in bio."},
+        {type:"Static",  title:"Partner or local business shoutout", cta:"We love our Syracuse community."},
+        {type:"Reel",    title:'"Real members, real results" — before/after or progress stories (with permission)', cta:"Every journey starts with one step. Take yours at Elevate."},
+        {type:"Carousel",title:'"Elevate vs. a regular gym" — side-by-side comparison', cta:"See what makes us different — elevatesyracuse.com."},
+      ],
+      facebook:[
+        {type:"Community",   title:"Community event announcement or local Syracuse initiative spotlight", cta:""},
+        {type:"Testimonial", title:'"Why I chose Elevate" — longer member quote + photo', cta:"Claim a free guest pass."},
+        {type:"Photo",       title:"Class group photo after workout", cta:"This is what community looks like. See you tomorrow!"},
+        {type:"Engagement",  title:'"Finish the sentence: Elevate makes me feel ___."', cta:""},
+      ],
+      tiktok:[
+        {type:"Video", title:'"Syracuse gym check" — trending format, amenity by amenity', cta:""},
+        {type:"Video", title:"Member transformation reaction (with permission)", cta:""},
+        {type:"Video", title:'"If Elevate were a person…" — fun personality-driven trend', cta:""},
+        {type:"Video", title:'"Bring a friend day" teaser or recap', cta:""},
+        {type:"Video", title:'"Working out in Syracuse in [season]" — relatable local humor', cta:""},
+      ],
+      actions:[
+        "Host a 'Bring a Friend' event or social hour — capture content",
+        "Reach out to 2–3 local businesses for cross-promotion opportunities",
+        "Repost any member-generated content (with permission and credit)",
+        "Monitor Facebook and local Syracuse pages for engagement opportunities",
+      ],
+    },
+    {
+      w:4, theme:"Your move.", color:"#059669",
+      goal:"Drive tour bookings, guest passes, and measurable leads.",
+      instagram:[
+        {type:"Reel",    title:'"What your first tour at Elevate looks like" — warm, zero pressure', cta:"Book yours free. Link in bio."},
+        {type:"Carousel",title:'"The Elevate Difference" — experience vs. budget gym', cta:"Claim your free guest pass."},
+        {type:"Reel",    title:'"I almost didn\'t walk in. Here\'s what happened."', cta:"Start your story at Elevate."},
+        {type:"Static",  title:'"Spring is coming. So is your best self." — seasonal motivation', cta:"Try a class on us."},
+        {type:"Reel",    title:'"48 hours at Elevate" — morning swim, afternoon class, evening recovery', cta:"This is what 'more than a gym' looks like."},
+      ],
+      facebook:[
+        {type:"Video Testimonial", title:"Video testimonial from a member or trainer", cta:"Book a free tour at elevatesyracuse.com."},
+        {type:"Seasonal",          title:'"Spring into fitness" — highlight seasonal programs', cta:"Try a class on us this week."},
+        {type:"Share Reel",        title:"Top-performing Instagram Reel shared natively to Facebook", cta:""},
+        {type:"Wrap-up",           title:'"An incredible month" — celebrate community milestones, tag members', cta:""},
+      ],
+      tiktok:[
+        {type:"Video", title:'"POV: You finally book the tour" — aspirational full experience', cta:""},
+        {type:"Video", title:'"Ranking every amenity at Elevate" — tier list format', cta:""},
+        {type:"Video", title:'"Things I wish I knew before joining a gym" — empathetic, beginner-friendly', cta:""},
+        {type:"Video", title:"Best moments recap — top 15 seconds from the month", cta:""},
+        {type:"Video", title:'"Reply to comments" — answer a follower question about Elevate', cta:""},
+      ],
+      actions:[
+        "Review analytics from all three platforms: top posts, engagement rates, follower growth",
+        "Identify 3 top-performing content types to double down on in Month 2",
+        "Compile leads generated: DMs, tour bookings, link clicks, guest pass claims",
+        "Plan Month 2 content calendar based on learnings",
+      ],
+    },
+  ],
+  kpis: {
+    growth: [
+      {platform:"Instagram", start:"851", organic:"1,100–1,300", paid:"1,500–2,000"},
+      {platform:"Facebook",  start:"4,700", organic:"4,900–5,100", paid:"5,200–5,800"},
+      {platform:"TikTok",    start:"9", organic:"200–500", paid:"500–1,500"},
+    ],
+    metrics: [
+      {metric:"Engagement Rate", target:"5–7%"},
+      {metric:"Saves & Shares", target:"20%+ of total engagement"},
+      {metric:"Tour Bookings from Social", target:"10–20 / month"},
+      {metric:"DMs & Inquiries", target:"Track weekly — respond within 2 hours"},
+      {metric:"Cost per Lead (paid)", target:"< $15"},
+    ],
+  },
+};
+
+function renderPlan(){
+  const plan = PLAN_DATA;
+
+  const PLAT_STYLES = {
+    instagram: {icon:"📸", color:"#E1306C", bg:"rgba(225,48,108,.08)"},
+    facebook:  {icon:"👥", color:"#1877F2", bg:"rgba(24,119,242,.08)"},
+    tiktok:    {icon:"🎵", color:"#111",    bg:"rgba(0,0,0,.06)"},
+  };
+
+  function platSection(key, posts){
+    const s = PLAT_STYLES[key];
+    const items = posts.map((p,i)=>`<li>
+      <span class="doc-post-num">${i+1}.</span>
+      <span class="doc-post-type" style="background:${s.bg};color:${s.color}">${esc(p.type)}</span>
+      <span class="doc-post-text">
+        ${esc(p.title)}
+        ${p.cta?`<div class="doc-post-cta" style="color:${s.color}">→ ${esc(p.cta)}</div>`:''}
+      </span>
+    </li>`).join('');
+    return `<div class="doc-plat-row">
+      <div class="doc-plat-lbl">
+        <span>${s.icon}</span>
+        <span class="doc-plat-name" style="color:${s.color}">${key.charAt(0).toUpperCase()+key.slice(1)}</span>
+        <span style="font-size:10px;color:var(--muted);font-weight:600">&nbsp;· ${posts.length} posts</span>
+      </div>
+      <ul class="doc-post-list">${items}</ul>
+    </div>`;
+  }
+
+  let html = `<div class="doc-wrap">`;
+
+  // ── Cover ──
+  html += `<div class="doc-cover">
+    <div class="doc-cover-eyebrow">Elevate Fitness · DeWitt &amp; Liverpool</div>
+    <div class="doc-cover-title">30-Day Social Media Action Plan</div>
+    <div class="doc-cover-sub">Building Engagement, Community &amp; Lead Generation · March 2026</div>
+    <div class="doc-cover-chips">
+      <span class="doc-cover-chip">📸 Instagram</span>
+      <span class="doc-cover-chip">👥 Facebook</span>
+      <span class="doc-cover-chip">🎵 TikTok</span>
+    </div>
+  </div>`;
+
+  // ── Strategic Framework ──
+  html += `<div class="doc-section">
+    <div class="doc-h1">Strategic Framework</div>
+    <div class="doc-callout">Goal: Move every prospect one step closer to walking through our doors. Social media starts the conversation — the sales team closes it.</div>
+
+    <div class="doc-h2">Content Mix — The 60 / 30 / 10 Rule</div>`;
+  plan.strategy.mix.forEach(m => {
+    html += `<div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:7px">
+      <span style="font-size:13px;font-weight:800;color:var(--indigo);flex-shrink:0;width:34px">${esc(m.pct)}</span>
+      <div><span style="font-size:12px;font-weight:700;color:var(--dark)">${esc(m.cat)}</span>
+      <div style="font-size:11px;color:var(--muted);margin-top:1px;line-height:1.4">${esc(m.eg)}</div></div>
+    </div>`;
+  });
+
+  html += `<div class="doc-h2">Soft CTAs We Use</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden">`;
+  plan.strategy.ctaExamples.forEach((c,i) => {
+    html += `<div style="display:flex;gap:0;${i<plan.strategy.ctaExamples.length-1?'border-bottom:1px solid #F3F4F6':''}">
+      <div style="flex:1;padding:8px 12px;font-size:12px;font-weight:700;color:var(--indigo)">"${esc(c.soft)}"</div>
+      <div style="flex:1;padding:8px 12px;font-size:11px;color:var(--muted);border-left:1px solid #F3F4F6">${esc(c.does)}</div>
+    </div>`;
+  });
+  html += `</div></div>`;
+
+  html += `<div class="doc-divider"></div>`;
+
+  // ── Week-by-week ──
+  html += `<div class="doc-section"><div class="doc-h1">The 4-Week Playbook</div>`;
+
+  plan.weeks.forEach(wk => {
+    html += `<div class="doc-week-band">
+      <div class="doc-week-accent" style="background:${wk.color}"></div>
+      <div class="doc-week-body">
+        <div class="doc-week-label">Week ${wk.w}</div>
+        <div class="doc-week-theme">"${esc(wk.theme)}"</div>
+        <div class="doc-week-goal">${esc(wk.goal)}</div>
+      </div>
+    </div>`;
+
+    // Platform post lists
+    html += platSection('instagram', wk.instagram);
+    html += platSection('facebook',  wk.facebook);
+    html += platSection('tiktok',    wk.tiktok);
+
+    // Action items
+    if(wk.actions && wk.actions.length){
+      html += `<div style="background:#F8F6FF;border-radius:10px;padding:11px 13px;margin-top:10px">
+        <div style="font-size:10px;font-weight:800;color:var(--indigo);letter-spacing:.07em;text-transform:uppercase;margin-bottom:8px">✅ Week ${wk.w} Action Items</div>
+        <ul class="doc-action-list">${wk.actions.map(a=>`<li>${esc(a)}</li>`).join('')}</ul>
+      </div>`;
+    }
+
+    if(wk.w < 4) html += `<div class="doc-divider"></div>`;
+  });
+
+  html += `</div>`;
+
+  html += `<div class="doc-divider"></div>`;
+
+  // ── KPIs ──
+  html += `<div class="doc-section">
+    <div class="doc-h1">30-Day Targets &amp; KPIs</div>
+    <div class="doc-h2">Follower Growth</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;background:#F9FAFB;padding:6px 12px;font-size:9px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;border-bottom:1px solid var(--border)">
+        <span>Platform</span><span>Start</span><span>Organic</span><span style="color:var(--green)">w/ Paid</span>
+      </div>
+      ${plan.kpis.growth.map(g=>`<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;padding:8px 12px;font-size:12px;border-bottom:1px solid #F9FAFB">
+        <span style="font-weight:700">${esc(g.platform)}</span>
+        <span style="color:var(--muted)">${esc(g.start)}</span>
+        <span style="font-weight:600">${esc(g.organic)}</span>
+        <span style="color:var(--green);font-weight:700">${esc(g.paid)}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="doc-h2">Metrics That Matter</div>
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:4px 12px;margin-bottom:14px">
+      ${plan.kpis.metrics.map(m=>`<div class="doc-kpi-row">
+        <span style="font-weight:700;color:var(--dark)">${esc(m.metric)}</span>
+        <span style="font-weight:700;color:var(--indigo)">${esc(m.target)}</span>
+      </div>`).join('')}
+    </div>
+
+    <div class="doc-callout">Vanity check: Follower count and likes are nice — but if they're not converting to tours and memberships, they're not doing their job. Always ask: "How many leads did this produce?"</div>
+  </div>
+
+  <div class="doc-tagline">Real people. Real fitness. Real community. · elevatesyracuse.com</div>
+  </div>`; // close doc-wrap
+
+  return html;
+}
+
+/* ══════════════════════════════════════════════════
+   MODAL — CAPTION EDITOR
+══════════════════════════════════════════════════ */
+function openModal(id){
+  S.modalId = id;
+  renderModal();
+}
+function renderModal(){
+  const p = S.posts.find(x => x.id === S.modalId);
+  if(!p) return;
+  const ce = canEdit(), ca = canApprove();
+  document.getElementById('modal').innerHTML = `
+  <div class="overlay" onclick="if(event.target===this)closeModal()">
+    <div class="sheet">
+      <div class="sheet-handle"><div class="handle-bar"></div></div>
+      <div class="sheet-hdr">
+        <div>
+          <div class="sheet-title">Caption Editor</div>
+          <div style="margin-top:5px">${platBadge(p.platform)}</div>
+        </div>
+        <button class="btn-close" onclick="closeModal()">×</button>
+      </div>
+      <div class="sheet-body">
+        <div class="concept-pill">📌 ${esc(p.title)}</div>
+        <div>
+          <label class="f-label">Production Notes</label>
+          <textarea class="f-textarea" id="m-notes" rows="3" ${!ce?'disabled':''} placeholder="Filming notes, visual direction…">${esc(p.notes||'')}</textarea>
+        </div>
+        ${ce?`<button class="btn-gen ready" id="gen-btn" onclick="genCaption()">✨ Generate Elevate Caption</button>`:''}
+        <div id="gen-err" style="display:none" class="err-box"></div>
+        <div>
+          <label class="f-label">Caption Copy</label>
+          <textarea class="f-textarea mono" id="m-caption" rows="10" ${!ce?'disabled':''} placeholder="Generated caption appears here — or type manually…">${esc(p.caption||'')}</textarea>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          ${ce?`<div class="action-row">
+            <button class="action-btn draft" onclick="saveModal('In progress')">💾 Save Draft</button>
+            <button class="action-btn submit" onclick="saveModal('Submitted')">📤 Submit for Review</button>
+          </div>`:''}
+          ${ca?`<button class="action-btn approve" onclick="saveModal('Done')">✅ Approve Post</button>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+function closeModal(){ document.getElementById('modal').innerHTML = ''; S.modalId = null; }
+
+async function genCaption(){
+  const btn = document.getElementById('gen-btn');
+  const err = document.getElementById('gen-err');
+  const p   = S.posts.find(x => x.id === S.modalId);
+  const notes = document.getElementById('m-notes').value;
+  btn.className = 'btn-gen loading';
+  btn.innerHTML = '<div class="spin"></div> Generating…';
+  btn.disabled = true;
+  err.style.display = 'none';
+
+  const SYS = `You are the Elevate Fitness Social Media Assistant (elevatesyracuse.com), Syracuse NY — two locations: DeWitt and Liverpool.
+Brand: "More than a gym." | "Real people. Real fitness. Real community."
+Voice: Inviting, energetic, motivational, human, community-first. Short punchy sentences. Use "you" and "we".
+NEVER use "join now". Soft CTAs only: "book a free tour", "claim your guest pass", "try a class on us", "explore our recovery center".
+Never mention prices or schedules. Refer to elevatesyracuse.com for those.
+No unsafe fitness claims. Brand filter: Real, Inclusive, Elevating.
+Offerings: group fitness, spin, strength/functional training, Pilates, personal training, small group PT, recovery centers (infrared sauna, compression therapy, red light therapy), pools, aquatics + swim lessons (all ages/year-round), pickleball, tennis, indoor track (Liverpool only), DEKA events.
+
+Output EXACTLY this format — no extra text before or after:
+HOOK: [1 punchy attention-grabbing line]
+CAPTION:
+[line 1]
+[line 2]
+[line 3 — optional 4th if needed]
+CTA: [1 soft action CTA]
+HASHTAGS: [10–12 from this bank: #ElevateSyracuse #ElevateFitness #MoreThanAGym #CNYFitness #SyracuseNY #CentralNY #FitFam #StrongerTogether #DeWittNY #LiverpoolNY #CNY #SyracuseLife #CNYWellness #GroupFitness #SpinClass #StrengthTraining #PersonalTraining #Aquatics #SwimLessons #Pickleball #Tennis #Sauna #IndoorTrack #DEKA #KeepShowingUp #YouGotThis #ProgressNotPerfection #MoveFeelLive]
+ALT TEXT: [1-sentence image/video description for accessibility]
+PRODUCTION NOTE: [1 practical filming or design tip]`;
+
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        system:SYS,
+        messages:[{role:"user",content:`Platform: ${p.platform}\nPost format: ${p.type}\nConcept: ${p.title}\nCTA direction: ${p.cta||'Brand awareness or tour booking'}\nAdditional notes: ${notes||'None'}`}]
+      })
+    });
+    const d = await r.json();
+    const t = (d.content||[]).find(b=>b.type==='text')?.text || '';
+    if(!t) throw new Error('empty');
+    document.getElementById('m-caption').value = t;
+  } catch(e){
+    err.style.display = 'block';
+    err.textContent = '⚠️ Generation failed. Check your connection and try again.';
+  }
+  btn.className = 'btn-gen ready';
+  btn.innerHTML = '🔄 Regenerate';
+  btn.disabled = false;
+}
+
+function saveModal(newStatus){
+  const cap   = document.getElementById('m-caption');
+  const notes = document.getElementById('m-notes');
+  const updated = S.posts.map(p => p.id !== S.modalId ? p : {
+    ...p,
+    caption: cap   ? cap.value   : p.caption,
+    notes:   notes ? notes.value : p.notes,
+    status:  newStatus
+  });
+  S.posts = updated;
+  const item = updated.find(p => p.id === S.modalId);
+  if(item){
+    const writes = {"Status": newStatus};
+    if(cap) writes["Caption"] = cap.value;
+    writeCalNotion(item, writes);
+  }
+  closeModal();
+  render();
+}
+
+/* ══════════════════════════════════════════════════
+   ACTIONS
+══════════════════════════════════════════════════ */
+function toggleNeeded(id){ S.expNeeded.has(id) ? S.expNeeded.delete(id) : S.expNeeded.add(id); render(); }
+function toggleExpand(id){ S.expPosts.has(id)  ? S.expPosts.delete(id)  : S.expPosts.add(id);  render(); }
+
+function cycleStatus(e){
+  e.stopPropagation();
+  const card = e.target.closest('[id^="card-"]');
+  if(!card) return;
+  const id = card.id.replace('card-','');
+  const p  = S.posts.find(x => x.id === id);
+  if(!p || !canCycle()) return;
+  const newStat = STAT_CYCLE[p.status] || 'In progress';
+  S.posts = S.posts.map(x => x.id===id ? {...x, status:newStat} : x);
+  writeCalNotion(p, {"Status": newStat});
+  render();
+}
+
+function setFP(v){ S.filterPlat = v; render(); }
+
+
+function claimPost(id){
+  const el = document.getElementById('name-'+id);
+  const name = el ? el.value.trim() : '';
+  if(!name){ if(el){ el.classList.add('err'); el.placeholder='Enter your name first'; } return; }
+  // Update local state immediately for responsive UI
+  const item = nextWeekItems.find(x => x.id === id);
+  if(item){ item.claimedBy = name; }
+  // Auto-sync to Notion — no manual refresh needed
+  writeNotion(item, {"Claimed By": name, "Status": "In progress"});
+  render();
+}
+
+function unclaimPost(id){
+  const item = nextWeekItems.find(x => x.id === id);
+  if(item){ item.claimedBy = ''; item.contentLink = ''; }
+  writeNotion(item, {"Claimed By": "", "Content Link": "", "Status": "Not started"});
+  render();
+}
+
+function submitLink(id){
+  const el  = document.getElementById('link-'+id);
+  const url = el ? el.value.trim() : '';
+  if(!url || !url.startsWith('http')){ if(el){ el.classList.add('err'); el.placeholder='Paste a valid link'; } return; }
+  const item = nextWeekItems.find(x => x.id === id);
+  if(item){ item.contentLink = url; }
+  writeNotion(item, {"Content Link": url});
+  render();
+}
+
+function toggleNeedContent(id){
+  const item = nextWeekItems.find(x => x.id === id);
+  if(item){ item.needContent = !item.needContent; }
+  writeNotion(item, {"Need Content": item && item.needContent ? "__YES__" : "__NO__"});
+  render();
+}
+
+/* ══════════════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════════════ */
+function render(){
+  // Tab badge — total content requests not yet delivered
+  const openNeeded = nextWeekItems.filter(p => p.needContent && !p.contentLink).length;
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === S.tab);
+  });
+  // Re-render tab strip with badges
+  document.getElementById('tabs').innerHTML = `
+    <button class="tab${S.tab==='needed'?' active':''}" data-tab="needed" onclick="setTab('needed')">🎬 Needed${openNeeded?` <span class="tab-badge">${openNeeded}</span>`:''}</button>
+    <button class="tab${S.tab==='calendar'?' active':''}" data-tab="calendar" onclick="setTab('calendar')">📅 Calendar</button>
+    <button class="tab${S.tab==='plan'?' active':''}" data-tab="plan" onclick="setTab('plan')">🗓 Plan</button>
+  `;
+
+const main = document.getElementById('main');
+  main.style.animation = 'none';
+  main.innerHTML = S.tab==='needed' ? renderNeeded() : S.tab==='calendar' ? renderCalendar() : renderPlan();
+  void main.offsetWidth;
+  main.style.animation = 'fadeUp .2s ease';
+}
+
+function setTab(t){ S.tab = t; render(); }
+
+/* ── BOOT ── */
+// Dynamic header month
+(function(){
+  const m = new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  document.getElementById('hdr-month').textContent = m;
+})();
+document.getElementById('sync-btn').addEventListener('click', syncNotion);
+render();
+</script>
+</body>
+</html>
