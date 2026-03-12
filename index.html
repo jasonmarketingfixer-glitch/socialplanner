@@ -411,103 +411,92 @@ const canEdit   = () => true;
 const canApprove = () => true;
 
 /* ══════════════════════════════════════════════════
-   NOTION SYNC (direct Notion REST API)
+   NOTION SYNC — via Cloudflare Worker proxy
+   Proxy repo: see worker.js in your deployment
 ══════════════════════════════════════════════════ */
 
-// Database IDs (from the collection:// URLs)
-const DB_CURRENT  = "24c3728fa92680f0ba7ac2f76c641683";  // current week
-const DB_NEXT     = "3203728fa92680f384aad2552712eb3f";  // next week planning
+// ⚠️  Update this to your Worker URL after deploying to Cloudflare
+const PROXY = "https://elevate-notion-proxy.jason-marketing-fixer.workers.dev";
+const ALLOWED_ORIGIN = "https://jasonmarketingfixer-glitch.github.io";
+const DB_CURRENT = "24c3728fa92680f0ba7ac2f76c641683";
+const DB_NEXT    = "3203728fa92680f384aad2552712eb3f";
 
-// nextWeekItems holds rows fetched live from the "next week planning" DB.
-// Only rows with Need Content = true appear in the Needed tab.
-// This is separate from S.posts (which is the current-week calendar).
-let nextWeekItems = [];   // { notionUrl, title, platform, notes, claimedBy, contentLink, needContent }
-let syncErrors = [];      // surfaces errors to the UI
+let nextWeekItems = [];
+let syncErrors    = [];
 
-// Retrieve token from localStorage (persisted across sessions)
-function getToken(){ return localStorage.getItem('notion_token') || ''; }
-function saveToken(t){ localStorage.setItem('notion_token', t.trim()); }
-
-// Notion REST API helper — queries a database and returns all pages
-async function notionQueryDB(dbId, token, filter){
-  const headers = {
-    "Authorization": "Bearer " + token,
-    "Content-Type": "application/json",
-    "Notion-Version": "2022-06-28"
-  };
+// Query a Notion database via proxy
+async function notionQueryDB(dbId, filter){
   const body = filter ? {filter} : {};
   const pages = [];
-  let cursor = undefined;
+  let cursor;
   do {
-    const payload = {...body, page_size: 100};
-    if(cursor) payload.start_cursor = cursor;
-    const res = await fetch(`https://api.notion.com/v1/databases/${dbId}/query`, {
-      method:"POST", headers, body: JSON.stringify(payload)
+    const payload = { ...body, page_size: 100 };
+    if (cursor) payload.start_cursor = cursor;
+    const res = await fetch(`${PROXY}/query/${dbId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
     });
-    if(!res.ok){
-      const err = await res.json().catch(()=>({message:res.statusText}));
-      throw new Error(err.message || `HTTP ${res.status}`);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }));
+      throw new Error(err.error || err.message || `HTTP ${res.status}`);
     }
     const data = await res.json();
     pages.push(...(data.results || []));
     cursor = data.has_more ? data.next_cursor : undefined;
-  } while(cursor);
+  } while (cursor);
   return pages;
 }
 
-// Update a Notion page's properties via REST API
-async function notionUpdatePage(pageId, token, properties){
-  const res = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
-    method:"PATCH",
-    headers:{
-      "Authorization":"Bearer " + token,
-      "Content-Type":"application/json",
-      "Notion-Version":"2022-06-28"
-    },
-    body: JSON.stringify({properties})
+// Update a Notion page via proxy
+async function notionUpdatePage(pageId, properties){
+  const res = await fetch(`${PROXY}/pages/${pageId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ properties }),
   });
-  if(!res.ok){
-    const err = await res.json().catch(()=>({message:res.statusText}));
-    throw new Error(err.message || `HTTP ${res.status}`);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(err.error || err.message || `HTTP ${res.status}`);
   }
   return res.json();
 }
 
-// Extract property value from a Notion page object
+// Extract a typed property value from a raw Notion page object
 function notionProp(page, key){
   const p = page.properties?.[key];
-  if(!p) return null;
-  switch(p.type){
-    case 'title':      return p.title?.map(t=>t.plain_text).join('') || '';
-    case 'rich_text':  return p.rich_text?.map(t=>t.plain_text).join('') || '';
-    case 'select':     return p.select?.name || '';
-    case 'status':     return p.status?.name || '';
-    case 'checkbox':   return p.checkbox === true;
-    case 'url':        return p.url || '';
-    case 'date':       return p.date?.start || null;
-    case 'files':      return (p.files||[]).length > 0;
-    default:           return null;
+  if (!p) return null;
+  switch (p.type) {
+    case 'title':     return p.title?.map(t => t.plain_text).join('') || '';
+    case 'rich_text': return p.rich_text?.map(t => t.plain_text).join('') || '';
+    case 'select':    return p.select?.name || '';
+    case 'status':    return p.status?.name || '';
+    case 'checkbox':  return p.checkbox === true;
+    case 'url':       return p.url || '';
+    case 'date':      return p.date?.start || null;
+    case 'files':     return (p.files || []).length > 0;
+    default:          return null;
   }
 }
 
-// Build Notion property patch object from friendly key→value map
+// Build a Notion property patch payload from a plain update map
 function buildNotionProps(updates){
   const props = {};
-  for(const [k, v] of Object.entries(updates)){
-    if(k === 'Status')     props[k] = {status:{name: v}};
-    else if(k === 'Caption' || k === 'Claimed By' || k === 'Notes')
-                            props[k] = {rich_text:[{text:{content: String(v)}}]};
-    else if(k === 'Content Link') props[k] = {url: v || null};
-    else if(k === 'Need Content') props[k] = {checkbox: !!v};
+  for (const [k, v] of Object.entries(updates)) {
+    if (k === 'Status')
+      props[k] = { status: { name: v } };
+    else if (['Caption', 'Claimed By', 'Notes'].includes(k))
+      props[k] = { rich_text: [{ text: { content: String(v) } }] };
+    else if (k === 'Content Link')
+      props[k] = { url: v || null };
+    else if (k === 'Need Content')
+      props[k] = { checkbox: !!v };
   }
   return props;
 }
 
 async function syncNotion(){
   if(S.syncing) return;
-  const token = getToken();
-  if(!token){ render(); return; }   // show token screen
-
   S.syncing = true;
   syncErrors = [];
   const btn = document.getElementById('sync-btn');
@@ -515,11 +504,10 @@ async function syncNotion(){
   btn.innerHTML = '<div class="spin-sm"></div> Syncing…';
 
   const [nextRes, curRes] = await Promise.allSettled([
-    notionQueryDB(DB_NEXT, token),
-    notionQueryDB(DB_CURRENT, token),
+    notionQueryDB(DB_NEXT),
+    notionQueryDB(DB_CURRENT),
   ]);
 
-  // Parse next-week results
   if(nextRes.status === 'fulfilled'){
     nextWeekItems = nextRes.value.map((page, i) => ({
       id: 'nw-' + i,
@@ -534,10 +522,9 @@ async function syncNotion(){
       needContent: notionProp(page, 'Need Content') === true,
     }));
   } else {
-    syncErrors.push('Next week DB: ' + nextRes.reason?.message);
+    syncErrors.push('Next week DB: ' + (nextRes.reason?.message || nextRes.reason));
   }
 
-  // Parse current-week results — replaces S.posts entirely
   if(curRes.status === 'fulfilled'){
     S.posts = curRes.value.map((page, i) => ({
       id: 'cw-' + i,
@@ -556,7 +543,7 @@ async function syncNotion(){
       hasPost: notionProp(page, 'Post') === true,
     }));
   } else {
-    syncErrors.push('Current week DB: ' + curRes.reason?.message);
+    syncErrors.push('Current week DB: ' + (curRes.reason?.message || curRes.reason));
   }
 
   S.syncDone = true;
@@ -577,86 +564,19 @@ async function syncNotion(){
 }
 
 async function writeNotion(item, updates){
-  // Writes back to the next-week planning DB by page ID
   if(!item?.pageId) return;
-  const token = getToken();
-  if(!token) return;
-  notionUpdatePage(item.pageId, token, buildNotionProps(updates)).catch(()=>{});
+  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
 }
 
 async function writeCalNotion(item, updates){
-  // Writes back to the current-week DB by page ID
   if(!item?.pageId) return;
-  const token = getToken();
-  if(!token) return;
-  notionUpdatePage(item.pageId, token, buildNotionProps(updates)).catch(()=>{});
-}
-
-/* ══════════════════════════════════════════════════
-   TOKEN SETUP SCREEN
-══════════════════════════════════════════════════ */
-function renderTokenSetup(){
-  return `<div style="padding:4px 0">
-    <div style="background:linear-gradient(135deg,#1B0A6E,#007DA8);border-radius:14px;padding:20px 18px;color:#fff;margin-bottom:16px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:6px">One-time setup</div>
-      <div style="font-size:17px;font-weight:800;margin-bottom:6px">Connect to Notion</div>
-      <div style="font-size:12px;opacity:.75;line-height:1.5">This app reads directly from your Notion databases. You need a Notion integration token to get started — it only takes 2 minutes.</div>
-    </div>
-
-    <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:800;color:var(--indigo);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px">How to get your token</div>
-      ${[
-        ['1', 'Go to', 'notion.so/profile/integrations', 'https://www.notion.so/profile/integrations'],
-        ['2', 'Click <strong>"New integration"</strong> → name it (e.g. "Content Hub") → Save', null, null],
-        ['3', 'Copy the <strong>Internal Integration Token</strong> (starts with <code>ntn_</code>)', null, null],
-        ['4', 'Open your <strong>Content Planning Calendar</strong> in Notion → click <strong>⋯ → Connections → Add connection</strong> → pick your new integration', null, null],
-        ['5', 'Paste the token below and tap Connect', null, null],
-      ].map(([n,label,linkText,linkUrl])=>`
-        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
-          <span style="width:20px;height:20px;border-radius:50%;background:var(--indigo);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${n}</span>
-          <span style="font-size:12px;color:#374151;line-height:1.5">${label}${linkText?` <a href="${linkUrl}" target="_blank" style="color:var(--blue);font-weight:600">${linkText}</a>`:''}</span>
-        </div>`).join('')}
-    </div>
-
-    <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:800;color:var(--grey);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Paste your token</div>
-      <input id="token-input" type="password"
-        placeholder="ntn_xxxxxxxxxxxxxxxxxxxx"
-        style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px"
-        value="${esc(getToken())}"
-      />
-      <button onclick="saveTokenAndSync()"
-        style="width:100%;background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">
-        Connect &amp; Sync →
-      </button>
-      <div id="token-err" style="font-size:11px;color:#DC2626;margin-top:8px;display:none"></div>
-    </div>
-
-    <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.5;padding:4px 12px">
-      🔒 Your token is stored only in your browser's local storage — never sent anywhere except directly to Notion's API.
-    </div>
-  </div>`;
-}
-
-async function saveTokenAndSync(){
-  const input = document.getElementById('token-input');
-  const errEl = document.getElementById('token-err');
-  const token = (input?.value || '').trim();
-  if(!token.startsWith('ntn_') && !token.startsWith('secret_')){
-    if(errEl){ errEl.textContent = 'Token should start with ntn_ or secret_'; errEl.style.display='block'; }
-    return;
-  }
-  saveToken(token);
-  syncNotion();
+  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
 }
 
 /* ══════════════════════════════════════════════════
    CONTENT NEEDED TAB
 ══════════════════════════════════════════════════ */
 function renderNeeded(){
-  // Token gate — must set up Notion token first
-  if(!getToken()) return renderTokenSetup();
-
   // Show sync errors prominently if any
   const errBanner = syncErrors.length
     ? `<div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#991B1B;line-height:1.5">
@@ -779,9 +699,6 @@ function needCard(p){
    CALENDAR TAB — Weekly Grid View (live from Notion)
 ══════════════════════════════════════════════════ */
 function renderCalendar(){
-  // Token gate
-  if(!getToken()) return renderTokenSetup();
-
   // Gate: prompt sync if no live data yet
   if(!S.lastSync){
     return `<div class="empty">
@@ -1446,10 +1363,7 @@ function setTab(t){ S.tab = t; render(); }
   const m = new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
   document.getElementById('hdr-month').textContent = m;
 })();
-document.getElementById('sync-btn').addEventListener('click', ()=>{
-  if(!getToken()){ S.tab='needed'; render(); }  // show token setup
-  else syncNotion();
-});
+document.getElementById('sync-btn').addEventListener('click', syncNotion);
 render();
 </script>
 </body>
