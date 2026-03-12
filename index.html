@@ -411,88 +411,51 @@ const canEdit   = () => true;
 const canApprove = () => true;
 
 /* ══════════════════════════════════════════════════
-   NOTION SYNC — via Cloudflare Worker proxy
-   Proxy repo: see worker.js in your deployment
+   NOTION SYNC — via Anthropic API + Notion MCP
+   No Worker, no token management needed.
+   Claude reads/writes Notion server-side.
 ══════════════════════════════════════════════════ */
 
-// ⚠️  Update this to your Worker URL after deploying to Cloudflare
-const PROXY = "https://elevate-notion-proxy.jason-marketing-fixer.workers.dev";
-const ALLOWED_ORIGIN = "https://jasonmarketingfixer-glitch.github.io";
-const DB_CURRENT = "24c3728fa92680f0ba7ac2f76c641683";
-const DB_NEXT    = "3203728fa92680f384aad2552712eb3f";
+const DB_CURRENT_URL = "https://www.notion.so/24c3728fa92680f0ba7ac2f76c641683";
+const DB_NEXT_URL    = "https://www.notion.so/3203728fa92680f384aad2552712eb3f";
 
 let nextWeekItems = [];
 let syncErrors    = [];
 
-// Query a Notion database via proxy
-async function notionQueryDB(dbId, filter){
-  const body = filter ? {filter} : {};
-  const pages = [];
-  let cursor;
-  do {
-    const payload = { ...body, page_size: 100 };
-    if (cursor) payload.start_cursor = cursor;
-    const res = await fetch(`${PROXY}/query/${dbId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }));
-      throw new Error(err.error || err.message || `HTTP ${res.status}`);
-    }
-    const data = await res.json();
-    pages.push(...(data.results || []));
-    cursor = data.has_more ? data.next_cursor : undefined;
-  } while (cursor);
-  return pages;
-}
-
-// Update a Notion page via proxy
-async function notionUpdatePage(pageId, properties){
-  const res = await fetch(`${PROXY}/pages/${pageId}`, {
-    method: "PATCH",
+// Call Claude via Anthropic API with Notion MCP attached
+async function claudeNotion(userPrompt, systemPrompt){
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ properties }),
+    body: JSON.stringify({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 4000,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userPrompt }],
+      mcp_servers: [{
+        type: "url",
+        url: "https://mcp.notion.com/mcp",
+        name: "notion"
+      }]
+    })
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(err.error || err.message || `HTTP ${res.status}`);
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
   }
-  return res.json();
+  const data = await res.json();
+  // Extract text from all content blocks
+  const text = (data.content || [])
+    .filter(b => b.type === 'text')
+    .map(b => b.text)
+    .join('');
+  return text;
 }
 
-// Extract a typed property value from a raw Notion page object
-function notionProp(page, key){
-  const p = page.properties?.[key];
-  if (!p) return null;
-  switch (p.type) {
-    case 'title':     return p.title?.map(t => t.plain_text).join('') || '';
-    case 'rich_text': return p.rich_text?.map(t => t.plain_text).join('') || '';
-    case 'select':    return p.select?.name || '';
-    case 'status':    return p.status?.name || '';
-    case 'checkbox':  return p.checkbox === true;
-    case 'url':       return p.url || '';
-    case 'date':      return p.date?.start || null;
-    case 'files':     return (p.files || []).length > 0;
-    default:          return null;
-  }
-}
-
-// Build a Notion property patch payload from a plain update map
-function buildNotionProps(updates){
-  const props = {};
-  for (const [k, v] of Object.entries(updates)) {
-    if (k === 'Status')
-      props[k] = { status: { name: v } };
-    else if (['Caption', 'Claimed By', 'Notes'].includes(k))
-      props[k] = { rich_text: [{ text: { content: String(v) } }] };
-    else if (k === 'Content Link')
-      props[k] = { url: v || null };
-    else if (k === 'Need Content')
-      props[k] = { checkbox: !!v };
-  }
-  return props;
+// Parse JSON from Claude's response safely
+function parseJSON(text){
+  const clean = text.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+  return JSON.parse(clean);
 }
 
 async function syncNotion(){
@@ -503,47 +466,84 @@ async function syncNotion(){
   btn.disabled = true;
   btn.innerHTML = '<div class="spin-sm"></div> Syncing…';
 
-  const [nextRes, curRes] = await Promise.allSettled([
-    notionQueryDB(DB_NEXT),
-    notionQueryDB(DB_CURRENT),
-  ]);
+  const SYS = `You are a Notion data assistant. When asked to query databases, use the Notion MCP tools to fetch the data, then respond ONLY with a valid JSON object — no markdown, no explanation, no extra text. Just the raw JSON.`;
 
-  if(nextRes.status === 'fulfilled'){
-    nextWeekItems = nextRes.value.map((page, i) => ({
-      id: 'nw-' + i,
-      pageId: page.id,
-      notionUrl: page.url || '',
-      title: notionProp(page, 'Notes') || '(Untitled)',
-      platform: notionProp(page, 'Platform') || '',
-      notes: notionProp(page, 'Notes') || '',
-      status: notionProp(page, 'Status') || 'Not started',
-      claimedBy: notionProp(page, 'Claimed By') || '',
-      contentLink: notionProp(page, 'Content Link') || '',
-      needContent: notionProp(page, 'Need Content') === true,
-    }));
-  } else {
-    syncErrors.push('Next week DB: ' + (nextRes.reason?.message || nextRes.reason));
-  }
+  const PROMPT = `Query both of these Notion databases and return ALL their rows as JSON.
 
-  if(curRes.status === 'fulfilled'){
-    S.posts = curRes.value.map((page, i) => ({
-      id: 'cw-' + i,
-      pageId: page.id,
-      notionUrl: page.url || '',
-      title: notionProp(page, 'Week of March 9, 2025') || '(Untitled)',
-      platform: notionProp(page, 'Platform') || '',
-      type: notionProp(page, 'Platform') || '',
-      status: notionProp(page, 'Status') || 'Not started',
-      caption: notionProp(page, 'Caption') || '',
-      notes: notionProp(page, 'Notes') || '',
-      date: notionProp(page, 'Date') || null,
-      needContent: notionProp(page, 'Need Content') === true,
-      claimedBy: notionProp(page, 'Claimed By') || '',
-      contentLink: notionProp(page, 'Content Link') || '',
-      hasPost: notionProp(page, 'Post') === true,
-    }));
-  } else {
-    syncErrors.push('Current week DB: ' + (curRes.reason?.message || curRes.reason));
+Database 1 — Current Week: ${DB_CURRENT_URL}
+Database 2 — Next Week Planning: ${DB_NEXT_URL}
+
+For each database, extract every row and return these fields:
+- id (Notion page ID)
+- url (Notion page URL)
+- title (the title/name field value)
+- platform (Platform select value)
+- status (Status value)
+- caption (Caption text)
+- notes (Notes text)
+- date (Date field start value, ISO format or null)
+- needContent (Need Content checkbox boolean)
+- claimedBy (Claimed By text)
+- contentLink (Content Link URL)
+- hasPost (true if Post field has any files attached)
+
+Return EXACTLY this JSON structure:
+{
+  "currentWeek": [ ...rows... ],
+  "nextWeek": [ ...rows... ]
+}`;
+
+  try {
+    const raw = await claudeNotion(PROMPT, SYS);
+    let parsed;
+    try {
+      parsed = parseJSON(raw);
+    } catch(e) {
+      throw new Error('Could not parse Notion data. Response: ' + raw.slice(0, 200));
+    }
+
+    // Map current week rows
+    if(Array.isArray(parsed.currentWeek)){
+      S.posts = parsed.currentWeek.map((row, i) => ({
+        id: 'cw-' + i,
+        pageId: row.id || '',
+        notionUrl: row.url || '',
+        title: row.title || '(Untitled)',
+        platform: row.platform || '',
+        type: row.platform || '',
+        status: row.status || 'Not started',
+        caption: row.caption || '',
+        notes: row.notes || '',
+        date: row.date || null,
+        needContent: !!row.needContent,
+        claimedBy: row.claimedBy || '',
+        contentLink: row.contentLink || '',
+        hasPost: !!row.hasPost,
+      }));
+    } else {
+      syncErrors.push('Current week DB: unexpected data format');
+    }
+
+    // Map next week rows
+    if(Array.isArray(parsed.nextWeek)){
+      nextWeekItems = parsed.nextWeek.map((row, i) => ({
+        id: 'nw-' + i,
+        pageId: row.id || '',
+        notionUrl: row.url || '',
+        title: row.title || row.notes || '(Untitled)',
+        platform: row.platform || '',
+        notes: row.notes || '',
+        status: row.status || 'Not started',
+        claimedBy: row.claimedBy || '',
+        contentLink: row.contentLink || '',
+        needContent: !!row.needContent,
+      }));
+    } else {
+      syncErrors.push('Next week DB: unexpected data format');
+    }
+
+  } catch(e) {
+    syncErrors.push(e.message || String(e));
   }
 
   S.syncDone = true;
@@ -553,8 +553,8 @@ async function syncNotion(){
 
   if(syncErrors.length){
     btn.innerHTML = '⚠️ Sync error';
-    document.getElementById('sync-info').textContent = syncErrors[0];
-    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 5000);
+    document.getElementById('sync-info').textContent = syncErrors[0].slice(0,80);
+    setTimeout(()=>{ btn.innerHTML = '↑ Sync Notion'; }, 8000);
   } else {
     btn.innerHTML = '✓ Synced';
     document.getElementById('sync-info').textContent = `Synced ${S.lastSync.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}`;
@@ -563,14 +563,23 @@ async function syncNotion(){
   render();
 }
 
+// Write updates back to a Notion page via Claude
+async function notionWrite(pageId, updates){
+  if(!pageId) return;
+  const SYS = `You are a Notion data assistant. Use the Notion MCP tools to update pages as instructed. Respond only with "done" when complete.`;
+  const fields = Object.entries(updates).map(([k,v]) => `- ${k}: ${JSON.stringify(v)}`).join('\n');
+  const prompt = `Update this Notion page: https://www.notion.so/${pageId.replace(/-/g,'')}\n\nSet these fields:\n${fields}`;
+  claudeNotion(prompt, SYS).catch(()=>{}); // fire and forget
+}
+
 async function writeNotion(item, updates){
   if(!item?.pageId) return;
-  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
+  notionWrite(item.pageId, updates);
 }
 
 async function writeCalNotion(item, updates){
   if(!item?.pageId) return;
-  notionUpdatePage(item.pageId, buildNotionProps(updates)).catch(()=>{});
+  notionWrite(item.pageId, updates);
 }
 
 /* ══════════════════════════════════════════════════
