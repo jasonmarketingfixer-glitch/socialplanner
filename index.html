@@ -386,54 +386,7 @@ let S = {
   syncing: false,
   syncDone: false,
   lastSync: null,
-  posts: [
-    {id:"p01",title:"5 Things You Didn't Know About Elevate",platform:"Instagram",type:"Carousel",status:"Done",
-     caption:"",notes:"Slides: recovery center, pool, classes, dual-club access, community events. Brand colors throughout.",
-     cta:"Tap the link in bio to book a free tour.",needContent:false,claimedBy:"",contentLink:""},
-    {id:"p02",title:"Welcome to Elevate — Photo Album",platform:"Facebook",type:"Photo Album",status:"Done",
-     caption:"",notes:"6–8 high-quality photos of both locations. No more than 8 — pick the strongest action shots.",
-     cta:"Book your free tour at elevatesyracuse.com.",needContent:false,claimedBy:"",contentLink:""},
-    {id:"p03",title:'"People think we\'re just a gym…" Reveal',platform:"TikTok",type:"Video",status:"In progress",
-     caption:"",notes:"Transition reveal: pool → recovery center → classes → pickleball court. Use trending audio. Under 30 sec. Vertical.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p04",title:"60-sec Cinematic Walkthrough — Liverpool",platform:"Instagram",type:"Reel",status:"In progress",
-     caption:"",notes:"Fast cuts, energetic music, text overlays on each amenity. START with indoor track for wow-factor. Portrait orientation. Aim for 45–60 sec.",
-     cta:"This isn't your average gym. See for yourself.",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p05",title:"Community Engagement Question",platform:"Facebook",type:"Question",status:"Not started",
-     caption:"",notes:"Static or plain text post. No sell — pure engagement. Ask what keeps members coming back to the gym.",
-     cta:"Drop your answer below!",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p06",title:'"Things My Trainer Says During Class"',platform:"TikTok",type:"Video",status:"Not started",
-     caption:"",notes:"Trainer on camera, candid humor. No script needed — let it be natural. Under 30 seconds. Vertical. Pick the most charismatic trainer.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p07",title:'"More than a gym." Brand Graphic',platform:"Instagram",type:"Static",status:"Not started",
-     caption:"",notes:"Graphic design only — no filming required. Use Elevate Indigo + Electric Blue. Clean tagline layout. Export as 1080×1080 PNG and share Drive link.",
-     cta:"What does fitness mean to you? Tell us below.",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p08",title:'"Things That Just Hit Different at Elevate"',platform:"TikTok",type:"Video",status:"In progress",
-     caption:"Things that just hit different at Elevate 🔥\n\nPool. Recovery. Classes. Energy. If you know, you know.\n\n#ElevateSyracuse #MoreThanAGym #CNYFitness #SyracuseNY #FitFam #KeepShowingUp",
-     notes:"Pool, sauna, classes, camaraderie montage. Trending audio. Caption drafted — needs final clip assembly.",
-     cta:"",needContent:false,claimedBy:"",contentLink:""},
-    {id:"p09",title:"Walkthrough Reel — Shared to Facebook",platform:"Facebook",type:"Share",status:"Not started",
-     caption:"",notes:"Share Instagram Reel p04 natively to Facebook once it's live. No new filming needed.",
-     cta:"See what makes us different.",needContent:false,claimedBy:"",contentLink:""},
-    {id:"p10",title:"Trainer Intro — '3 Things About Me'",platform:"Instagram",type:"Reel",status:"Not started",
-     caption:"",notes:"30 seconds max. Trainer on camera in casual gym setting. 3 fun facts format. Vertical. Get signed talent release first.",
-     cta:"Want to train with [Name]? Try a session free.",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p11",title:"Syracuse Community Tie-in",platform:"Facebook",type:"Story Post",status:"Not started",
-     caption:"",notes:"Photo of gym exterior or community event. Can pull from existing library. Include year Elevate was founded.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p12",title:'"Day in the Life at Elevate" POV',platform:"TikTok",type:"Video",status:"Not started",
-     caption:"",notes:"20–30 seconds. Member or staff POV: check-in at front desk → gym floor → class → recovery center. Vertical. No narration needed — let the footage speak.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p13",title:"Recovery Center Education Carousel",platform:"Instagram",type:"Carousel",status:"Not started",
-     caption:"",notes:"5-slide carousel. Need photos of: (1) infrared sauna interior, (2) compression boots in use, (3) red light therapy room, (4) recovery center entrance sign, (5) member using massage chair. Bright, clean shots. 1080×1350 each.",
-     cta:"Explore our recovery center — link in bio.",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p14",title:"Recovery Routine After Leg Day",platform:"TikTok",type:"Video",status:"Not started",
-     caption:"",notes:"Show real post-workout recovery flow: weights → compression boots → sauna. Real member or trainer. Under 45 seconds. Vertical. Time it to a trending sound.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-    {id:"p15",title:'"Syracuse\'s Best-Kept Fitness Secret"',platform:"TikTok",type:"Video",status:"Not started",
-     caption:"",notes:"Hook-driven reveal. Start with question text on screen: 'Does Syracuse actually have a gym with a pool, recovery center, AND pickleball?' Then reveal each amenity with reaction energy. Under 30 sec.",
-     cta:"",needContent:true,claimedBy:"",contentLink:""},
-  ]
+  posts: []   // populated exclusively from Notion sync — never hardcoded
 };
 
 /* ══════════════════════════════════════════════════
@@ -458,130 +411,155 @@ const canEdit   = () => true;
 const canApprove = () => true;
 
 /* ══════════════════════════════════════════════════
-   NOTION SYNC (via Claude API + Notion MCP)
+   NOTION SYNC (direct Notion REST API)
 ══════════════════════════════════════════════════ */
+
+// Database IDs (from the collection:// URLs)
+const DB_CURRENT  = "24c3728fa92680f0ba7ac2f76c641683";  // current week
+const DB_NEXT     = "3203728fa92680f384aad2552712eb3f";  // next week planning
 
 // nextWeekItems holds rows fetched live from the "next week planning" DB.
 // Only rows with Need Content = true appear in the Needed tab.
 // This is separate from S.posts (which is the current-week calendar).
-let nextWeekItems = [];   // { notionUrl, title, platform, notes, type, claimedBy, contentLink, needContent }
-let syncErrors = [];      // surfaces API/parse errors to the UI
+let nextWeekItems = [];   // { notionUrl, title, platform, notes, claimedBy, contentLink, needContent }
+let syncErrors = [];      // surfaces errors to the UI
 
-// Helper: extract a JSON array from any Claude API response text,
-// even if it's wrapped in markdown fences or has leading prose.
-function extractJsonArray(text){
-  // Try bare array first
-  let m = text.match(/\[[\s\S]*\]/);
-  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
-  // Try stripping ```json fences
-  const fenced = text.replace(/```(?:json)?/gi,'');
-  m = fenced.match(/\[[\s\S]*\]/);
-  if(m){ try{ return JSON.parse(m[0]); }catch(e){} }
-  return null;
+// Retrieve token from localStorage (persisted across sessions)
+function getToken(){ return localStorage.getItem('notion_token') || ''; }
+function saveToken(t){ localStorage.setItem('notion_token', t.trim()); }
+
+// Notion REST API helper — queries a database and returns all pages
+async function notionQueryDB(dbId, token, filter){
+  const headers = {
+    "Authorization": "Bearer " + token,
+    "Content-Type": "application/json",
+    "Notion-Version": "2022-06-28"
+  };
+  const body = filter ? {filter} : {};
+  const pages = [];
+  let cursor = undefined;
+  do {
+    const payload = {...body, page_size: 100};
+    if(cursor) payload.start_cursor = cursor;
+    const res = await fetch(`https://api.notion.com/v1/databases/${dbId}/query`, {
+      method:"POST", headers, body: JSON.stringify(payload)
+    });
+    if(!res.ok){
+      const err = await res.json().catch(()=>({message:res.statusText}));
+      throw new Error(err.message || `HTTP ${res.status}`);
+    }
+    const data = await res.json();
+    pages.push(...(data.results || []));
+    cursor = data.has_more ? data.next_cursor : undefined;
+  } while(cursor);
+  return pages;
 }
 
-// Helper: normalise NeedContent to boolean — handles true, "true", "__YES__", 1
-function parseNeedContent(v){
-  if(v === true || v === 1) return true;
-  if(typeof v === 'string') return v.trim().toUpperCase() === '__YES__' || v.trim().toLowerCase() === 'true';
-  return false;
+// Update a Notion page's properties via REST API
+async function notionUpdatePage(pageId, token, properties){
+  const res = await fetch(`https://api.notion.com/v1/pages/${pageId}`, {
+    method:"PATCH",
+    headers:{
+      "Authorization":"Bearer " + token,
+      "Content-Type":"application/json",
+      "Notion-Version":"2022-06-28"
+    },
+    body: JSON.stringify({properties})
+  });
+  if(!res.ok){
+    const err = await res.json().catch(()=>({message:res.statusText}));
+    throw new Error(err.message || `HTTP ${res.status}`);
+  }
+  return res.json();
+}
+
+// Extract property value from a Notion page object
+function notionProp(page, key){
+  const p = page.properties?.[key];
+  if(!p) return null;
+  switch(p.type){
+    case 'title':      return p.title?.map(t=>t.plain_text).join('') || '';
+    case 'rich_text':  return p.rich_text?.map(t=>t.plain_text).join('') || '';
+    case 'select':     return p.select?.name || '';
+    case 'status':     return p.status?.name || '';
+    case 'checkbox':   return p.checkbox === true;
+    case 'url':        return p.url || '';
+    case 'date':       return p.date?.start || null;
+    case 'files':      return (p.files||[]).length > 0;
+    default:           return null;
+  }
+}
+
+// Build Notion property patch object from friendly key→value map
+function buildNotionProps(updates){
+  const props = {};
+  for(const [k, v] of Object.entries(updates)){
+    if(k === 'Status')     props[k] = {status:{name: v}};
+    else if(k === 'Caption' || k === 'Claimed By' || k === 'Notes')
+                            props[k] = {rich_text:[{text:{content: String(v)}}]};
+    else if(k === 'Content Link') props[k] = {url: v || null};
+    else if(k === 'Need Content') props[k] = {checkbox: !!v};
+  }
+  return props;
 }
 
 async function syncNotion(){
   if(S.syncing) return;
+  const token = getToken();
+  if(!token){ render(); return; }   // show token screen
+
   S.syncing = true;
   syncErrors = [];
   const btn = document.getElementById('sync-btn');
   btn.disabled = true;
   btn.innerHTML = '<div class="spin-sm"></div> Syncing…';
 
-  // Run both DB queries in parallel
   const [nextRes, curRes] = await Promise.allSettled([
-    // --- NEXT WEEK planning DB ---
-    fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:2000,
-        system:"You are a Notion data helper. Query the requested data source and return ALL rows as a JSON array. No prose, no markdown fences — raw JSON array only.",
-        messages:[{role:"user",content:`Query Notion data source collection://3203728f-a926-815f-a710-000bbdd7f827 (Elevate Fitness next week planning). Return every row as a JSON array of objects with these fields: notionUrl (the page url field), title (the "Notes" title column value), Platform (the Platform select value), Status, Notes (same as title), ClaimedBy (the "Claimed By" text field), ContentLink (the "Content Link" url field), NeedContent (boolean — true only if "Need Content" checkbox is checked / equals __YES__). Return ONLY a valid JSON array, nothing else.`}],
-        mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
-      })
-    }),
-    // --- CURRENT WEEK DB ---
-    fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({
-        model:"claude-sonnet-4-20250514", max_tokens:3000,
-        system:"You are a Notion data helper. Query the requested data source and return ALL rows as a JSON array. No prose, no markdown fences — raw JSON array only.",
-        messages:[{role:"user",content:`Query Notion data source collection://24c3728f-a926-8185-b963-000b55ab896e (Elevate Fitness current week). Return every row as a JSON array of objects with these fields: notionUrl (the page url), title (the title column value), Platform, Status, Caption, Notes, Date (ISO date string from the Date field, or null), NeedContent (boolean — true only if "Need Content" checkbox is checked / equals __YES__), ClaimedBy (from "Claimed By"), ContentLink (from "Content Link"), HasPost (true if Post field has any files, false otherwise). Return ONLY a valid JSON array, nothing else.`}],
-        mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
-      })
-    })
+    notionQueryDB(DB_NEXT, token),
+    notionQueryDB(DB_CURRENT, token),
   ]);
 
   // Parse next-week results
   if(nextRes.status === 'fulfilled'){
-    try {
-      const data = await nextRes.value.json();
-      // Surface API-level errors
-      if(data.error){ syncErrors.push('Next week DB: ' + (data.error.message||JSON.stringify(data.error))); }
-      else {
-        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-        const rows = extractJsonArray(text);
-        if(rows && Array.isArray(rows)){
-          nextWeekItems = rows.map((r,i) => ({
-            id:'nw-'+i,
-            notionUrl: r.notionUrl||r.url||'',
-            title: r.title||r.Notes||'(Untitled)',
-            platform: r.Platform||'',
-            notes: r.Notes||r.title||'',
-            claimedBy: r.ClaimedBy||'',
-            contentLink: r.ContentLink||'',
-            needContent: parseNeedContent(r.NeedContent),
-          }));
-        } else {
-          syncErrors.push('Next week DB: could not parse response — ' + text.slice(0,120));
-        }
-      }
-    } catch(e){ syncErrors.push('Next week DB fetch error: ' + e.message); }
+    nextWeekItems = nextRes.value.map((page, i) => ({
+      id: 'nw-' + i,
+      pageId: page.id,
+      notionUrl: page.url || '',
+      title: notionProp(page, 'Notes') || '(Untitled)',
+      platform: notionProp(page, 'Platform') || '',
+      notes: notionProp(page, 'Notes') || '',
+      status: notionProp(page, 'Status') || 'Not started',
+      claimedBy: notionProp(page, 'Claimed By') || '',
+      contentLink: notionProp(page, 'Content Link') || '',
+      needContent: notionProp(page, 'Need Content') === true,
+    }));
   } else {
-    syncErrors.push('Next week DB network error: ' + nextRes.reason);
+    syncErrors.push('Next week DB: ' + nextRes.reason?.message);
   }
 
-  // Parse current-week results — replaces S.posts
+  // Parse current-week results — replaces S.posts entirely
   if(curRes.status === 'fulfilled'){
-    try {
-      const data = await curRes.value.json();
-      if(data.error){ syncErrors.push('Current week DB: ' + (data.error.message||JSON.stringify(data.error))); }
-      else {
-        const text = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-        const rows = extractJsonArray(text);
-        if(rows && Array.isArray(rows)){
-          S.posts = rows.map((r,i) => ({
-            id: 'cw-'+i,
-            notionUrl: r.notionUrl||r.url||'',
-            title: r.title||'(Untitled)',
-            platform: r.Platform||'',
-            type: r.Platform||'',
-            status: r.Status||'Not started',
-            caption: r.Caption||'',
-            notes: r.Notes||'',
-            date: r.Date||null,
-            needContent: parseNeedContent(r.NeedContent),
-            claimedBy: r.ClaimedBy||'',
-            contentLink: r.ContentLink||'',
-            hasPost: r.HasPost===true,
-          }));
-        } else {
-          syncErrors.push('Current week DB: could not parse response — ' + text.slice(0,120));
-        }
-      }
-    } catch(e){ syncErrors.push('Current week DB fetch error: ' + e.message); }
+    S.posts = curRes.value.map((page, i) => ({
+      id: 'cw-' + i,
+      pageId: page.id,
+      notionUrl: page.url || '',
+      title: notionProp(page, 'Week of March 9, 2025') || '(Untitled)',
+      platform: notionProp(page, 'Platform') || '',
+      type: notionProp(page, 'Platform') || '',
+      status: notionProp(page, 'Status') || 'Not started',
+      caption: notionProp(page, 'Caption') || '',
+      notes: notionProp(page, 'Notes') || '',
+      date: notionProp(page, 'Date') || null,
+      needContent: notionProp(page, 'Need Content') === true,
+      claimedBy: notionProp(page, 'Claimed By') || '',
+      contentLink: notionProp(page, 'Content Link') || '',
+      hasPost: notionProp(page, 'Post') === true,
+    }));
   } else {
-    syncErrors.push('Current week DB network error: ' + curRes.reason);
+    syncErrors.push('Current week DB: ' + curRes.reason?.message);
   }
 
-  S.syncDone = true;   // distinguish "never synced" from "synced but empty"
+  S.syncDone = true;
   S.lastSync = new Date();
   S.syncing = false;
   btn.disabled = false;
@@ -599,37 +577,86 @@ async function syncNotion(){
 }
 
 async function writeNotion(item, updates){
-  // Writes back to the "next week planning" DB
-  if(!item) return;
-  fetch("https://api.anthropic.com/v1/messages", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514", max_tokens:400,
-      system:"Update Notion pages using MCP tools. Reply only with 'done'.",
-      messages:[{role:"user",content:`In Notion data source collection://3203728f-a926-815f-a710-000bbdd7f827 (next week planning), find the row where the title (Notes column) is exactly "${item.title}". Update these properties: ${JSON.stringify(updates)}. Use notion-update-page.`}],
-      mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
-    })
-  }).catch(()=>{});
+  // Writes back to the next-week planning DB by page ID
+  if(!item?.pageId) return;
+  const token = getToken();
+  if(!token) return;
+  notionUpdatePage(item.pageId, token, buildNotionProps(updates)).catch(()=>{});
 }
 
 async function writeCalNotion(item, updates){
-  // Writes back to the "current week" DB by page URL
-  if(!item || !item.notionUrl) return;
-  fetch("https://api.anthropic.com/v1/messages", {
-    method:"POST", headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({
-      model:"claude-sonnet-4-20250514", max_tokens:400,
-      system:"Update Notion pages using MCP tools. Reply only with 'done'.",
-      messages:[{role:"user",content:`Update the Notion page at URL ${item.notionUrl} in collection://24c3728f-a926-8185-b963-000b55ab896e (current week). Apply these property updates: ${JSON.stringify(updates)}. Use notion-update-page.`}],
-      mcp_servers:[{type:"url",url:"https://mcp.notion.com/mcp",name:"notion"}]
-    })
-  }).catch(()=>{});
+  // Writes back to the current-week DB by page ID
+  if(!item?.pageId) return;
+  const token = getToken();
+  if(!token) return;
+  notionUpdatePage(item.pageId, token, buildNotionProps(updates)).catch(()=>{});
+}
+
+/* ══════════════════════════════════════════════════
+   TOKEN SETUP SCREEN
+══════════════════════════════════════════════════ */
+function renderTokenSetup(){
+  return `<div style="padding:4px 0">
+    <div style="background:linear-gradient(135deg,#1B0A6E,#007DA8);border-radius:14px;padding:20px 18px;color:#fff;margin-bottom:16px">
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.6;margin-bottom:6px">One-time setup</div>
+      <div style="font-size:17px;font-weight:800;margin-bottom:6px">Connect to Notion</div>
+      <div style="font-size:12px;opacity:.75;line-height:1.5">This app reads directly from your Notion databases. You need a Notion integration token to get started — it only takes 2 minutes.</div>
+    </div>
+
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--indigo);letter-spacing:.07em;text-transform:uppercase;margin-bottom:12px">How to get your token</div>
+      ${[
+        ['1', 'Go to', 'notion.so/profile/integrations', 'https://www.notion.so/profile/integrations'],
+        ['2', 'Click <strong>"New integration"</strong> → name it (e.g. "Content Hub") → Save', null, null],
+        ['3', 'Copy the <strong>Internal Integration Token</strong> (starts with <code>ntn_</code>)', null, null],
+        ['4', 'Open your <strong>Content Planning Calendar</strong> in Notion → click <strong>⋯ → Connections → Add connection</strong> → pick your new integration', null, null],
+        ['5', 'Paste the token below and tap Connect', null, null],
+      ].map(([n,label,linkText,linkUrl])=>`
+        <div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start">
+          <span style="width:20px;height:20px;border-radius:50%;background:var(--indigo);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">${n}</span>
+          <span style="font-size:12px;color:#374151;line-height:1.5">${label}${linkText?` <a href="${linkUrl}" target="_blank" style="color:var(--blue);font-weight:600">${linkText}</a>`:''}</span>
+        </div>`).join('')}
+    </div>
+
+    <div style="background:#fff;border:1.5px solid var(--border);border-radius:13px;padding:16px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:800;color:var(--grey);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px">Paste your token</div>
+      <input id="token-input" type="password"
+        placeholder="ntn_xxxxxxxxxxxxxxxxxxxx"
+        style="width:100%;border:1.5px solid var(--border);border-radius:9px;padding:10px 12px;font-size:13px;font-family:'DM Mono',monospace;outline:none;margin-bottom:10px"
+        value="${esc(getToken())}"
+      />
+      <button onclick="saveTokenAndSync()"
+        style="width:100%;background:linear-gradient(135deg,var(--indigo),var(--blue));color:#fff;border:none;border-radius:9px;padding:12px;font-size:14px;font-weight:700;cursor:pointer">
+        Connect &amp; Sync →
+      </button>
+      <div id="token-err" style="font-size:11px;color:#DC2626;margin-top:8px;display:none"></div>
+    </div>
+
+    <div style="font-size:11px;color:var(--muted);text-align:center;line-height:1.5;padding:4px 12px">
+      🔒 Your token is stored only in your browser's local storage — never sent anywhere except directly to Notion's API.
+    </div>
+  </div>`;
+}
+
+async function saveTokenAndSync(){
+  const input = document.getElementById('token-input');
+  const errEl = document.getElementById('token-err');
+  const token = (input?.value || '').trim();
+  if(!token.startsWith('ntn_') && !token.startsWith('secret_')){
+    if(errEl){ errEl.textContent = 'Token should start with ntn_ or secret_'; errEl.style.display='block'; }
+    return;
+  }
+  saveToken(token);
+  syncNotion();
 }
 
 /* ══════════════════════════════════════════════════
    CONTENT NEEDED TAB
 ══════════════════════════════════════════════════ */
 function renderNeeded(){
+  // Token gate — must set up Notion token first
+  if(!getToken()) return renderTokenSetup();
+
   // Show sync errors prominently if any
   const errBanner = syncErrors.length
     ? `<div style="background:#FEF2F2;border:1.5px solid #FCA5A5;border-radius:11px;padding:12px 14px;margin-bottom:12px;font-size:12px;color:#991B1B;line-height:1.5">
@@ -752,6 +779,9 @@ function needCard(p){
    CALENDAR TAB — Weekly Grid View (live from Notion)
 ══════════════════════════════════════════════════ */
 function renderCalendar(){
+  // Token gate
+  if(!getToken()) return renderTokenSetup();
+
   // Gate: prompt sync if no live data yet
   if(!S.lastSync){
     return `<div class="empty">
@@ -1416,7 +1446,10 @@ function setTab(t){ S.tab = t; render(); }
   const m = new Date().toLocaleDateString('en-US',{month:'long',year:'numeric'});
   document.getElementById('hdr-month').textContent = m;
 })();
-document.getElementById('sync-btn').addEventListener('click', syncNotion);
+document.getElementById('sync-btn').addEventListener('click', ()=>{
+  if(!getToken()){ S.tab='needed'; render(); }  // show token setup
+  else syncNotion();
+});
 render();
 </script>
 </body>
